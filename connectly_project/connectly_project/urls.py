@@ -25,4 +25,3 @@ urlpatterns = [
     path('posts/', include('posts.urls')),
     
 ]
-

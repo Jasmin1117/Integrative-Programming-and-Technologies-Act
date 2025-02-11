@@ -1,29 +1,33 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import User, Post, Comment
+from .models import Post, Comment
 
+# User Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'created_at']
+        fields = ['id', 'username', 'email']  # Exclude sensitive fields like password
 
+# Post Serializer
 class PostSerializer(serializers.ModelSerializer):
-    comments = serializers.StringRelatedField(many=True, read_only=True)
+    author_id = serializers.PrimaryKeyRelatedField(source="created_by", read_only=True)  # User ID
+    author_username = serializers.CharField(source="created_by.username", read_only=True)  # Username
 
     class Meta:
         model = Post
-        fields = ['id', 'content', 'author', 'created_at', 'comments']
+        fields = ["id", "content", "author_id", "author_username", "created_at"]  # Removed "title"
 
+# Comment Serializer (Fixed)
 class CommentSerializer(serializers.ModelSerializer):
+    author_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)  # User ID
+    author_username = serializers.CharField(source="user.username", read_only=True)  # Username
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+
     class Meta:
         model = Comment
-        fields = ['id', 'text', 'author', 'post', 'created_at']
+        fields = ['id', 'text', 'author_id', 'author_username', 'post', 'created_at']
 
     def validate_post(self, value):
         if not Post.objects.filter(id=value.id).exists():
             raise serializers.ValidationError("Post not found.")
-        return value
-
-    def validate_author(self, value):
-        if not User.objects.filter(id=value.id).exists():
-            raise serializers.ValidationError("Author not found.")
         return value
