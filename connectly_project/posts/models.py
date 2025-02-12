@@ -1,14 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Post Model
 class Post(models.Model):
-    content = models.TextField()
+    POST_TYPES = (
+        ('text', 'Text'),
+        ('image', 'Image'),
+        ('video', 'Video'),
+    )
+
+    title = models.CharField(max_length=255)  # Add missing title field
+    content = models.TextField(blank=True)  
+    post_type = models.CharField(max_length=10, choices=POST_TYPES)  # Add post type
+    metadata = models.JSONField(default=dict)  # Store metadata as JSON
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Post by {self.created_by.username} at {self.created_at}"  
+        return f"{self.title} by {self.created_by.username}"
+
 
 # Comment Model
 class Comment(models.Model):

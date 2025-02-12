@@ -8,14 +8,16 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']  # Exclude sensitive fields like password
 
+
 # Post Serializer
 class PostSerializer(serializers.ModelSerializer):
-    author_id = serializers.PrimaryKeyRelatedField(source="created_by", read_only=True)  # User ID
-    author_username = serializers.CharField(source="created_by.username", read_only=True)  # Username
+    author_id = serializers.PrimaryKeyRelatedField(source="created_by", read_only=True)  
+    author_username = serializers.CharField(source="created_by.username", read_only=True)  
 
     class Meta:
         model = Post
-        fields = ["id", "content", "author_id", "author_username", "created_at"]  # Removed "title"
+        fields = ["id", "title", "post_type", "content", "metadata", "author_id", "author_username", "created_at"]
+
 
 # Comment Serializer (Fixed)
 class CommentSerializer(serializers.ModelSerializer):
