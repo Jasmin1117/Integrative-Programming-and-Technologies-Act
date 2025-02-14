@@ -1,5 +1,7 @@
 # Integrative Programming and Technologies Activities
 
+Below are the Postman request screenshots for reference:
+
 ## 1. User Registration  
 **Content-Type:** `application/json`  
 <img src="https://github.com/user-attachments/assets/b4b3f3a4-0843-45d1-922c-81cda0caf021" width="500">
