@@ -18,12 +18,11 @@ Below are the Postman request screenshots for reference:
 ---
 
 ## 4. Get All Posts
-<img src="https://github.com/user-attachments/assets/625cbcd4-9d3f-420b-975e-90b4f938f4ae" width="500">
 
 ---
 
 ## 5. Get Post by Primary Key
-<img src="https://github.com/user-attachments/assets/4f171104-2ce5-422f-92ef-f0c917684372" width="500">
+
 
 
 ---
@@ -43,29 +42,16 @@ Below are the Postman request screenshots for reference:
 
 ---
 
-## 9.
-
-
----
-
-## 10. Get All Comments
+## 9. Get All Comments
 <img src="https://github.com/user-attachments/assets/93cdb477-2e37-4bec-94fa-7920dc1c4029" width="500">
 
 ---
 
-## 11. Get Comment by Post ID
+## 10. Get Comment by Post ID
 <img src="https://github.com/user-attachments/assets/49af48e2-4961-4635-b75e-d47df17bab78" width="500">
 
----
-
-## 12. 
-<img src="https://github.com/user-attachments/assets/9ef2a0f2-63bd-45d0-bc23-ddc4513fbbd7" width="500">
 
 ---
 
-## 13. 
+## 11 Get All Post by Username
 
----
-
-## 14 Get Comment by Username
-<img src="https://github.com/user-attachments/assets/cb368b03-49f7-4b97-9a2a-b40ee0f6388e" width="500">
