@@ -11,6 +11,8 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer # Cus
 from singletons.logger_singleton import LoggerSingleton
 from factories.post_factory import PostFactory
 from django.shortcuts import get_object_or_404
+from .permissions import IsPostAuthor
+
 
 # Initialize Logger
 logger = LoggerSingleton().get_logger()
@@ -123,13 +125,10 @@ class PostListCreate(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Post Detail View
 class PostDetailView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsPostAuthor]
 
-
-    # Retrieves a single post based on its primary key
     def get(self, request, pk):
         try:
             post = Post.objects.get(pk=pk)
@@ -138,19 +137,10 @@ class PostDetailView(APIView):
             logger.error(f"Post with ID {pk} not found.")
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    # Updates an existing post
     def put(self, request, pk):
         try:
             post = Post.objects.get(pk=pk)
-
-            if request.user.groups.filter(name="Admin").exists():
-                logger.warning(f"Admin '{request.user.username}' attempted to edit a post, which is not allowed.")
-                return Response({"error": "Admins cannot edit posts."}, status=status.HTTP_403_FORBIDDEN)
-
-            if post.created_by != request.user:
-                logger.warning(f"User '{request.user.username}' attempted to edit another user's post.")
-                return Response({"error": "You do not have permission to edit this post."}, status=status.HTTP_403_FORBIDDEN)
-
+            # No need to check if user is Admin or if the user is the author, IsPostAuthor does that
             serializer = PostSerializer(post, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -162,6 +152,18 @@ class PostDetailView(APIView):
         except Post.DoesNotExist:
             logger.error(f"Post with ID {pk} not found.")
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk):
+        try:
+            post = Post.objects.get(pk=pk)
+            # The IsPostAuthor permission will automatically check if the user is the author
+            post.delete()
+            logger.info(f"User '{request.user.username}' deleted post ID {pk}.")
+            return Response({"message": "Post deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+        except Post.DoesNotExist:
+            logger.error(f"Post with ID {pk} not found.")
+            return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
     # Deletes a post
     def delete(self, request, pk):
