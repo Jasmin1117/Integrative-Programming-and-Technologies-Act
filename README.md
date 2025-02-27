@@ -2,8 +2,8 @@
 
 Below are the Postman request screenshots for reference:
 
-## 1. User Registration
-<img src="https://github.com/user-attachments/assets/3049e8d6-c78d-462e-bff4-359b75d26dbb" width="500">
+## 1. Create a comment (through post_id)
+<img src="https://https://github.com/user-attachments/assets/51837170-c9a9-4a7a-94a1-a98684d52ac6" width="500">
 
 ---
 
