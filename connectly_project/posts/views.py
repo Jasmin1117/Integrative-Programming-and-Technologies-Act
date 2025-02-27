@@ -6,12 +6,16 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .models import Post, Comment
-from .serializers import UserSerializer, PostSerializer, CommentSerializer # Custom permission
+from .models import Post, Comment, Like
+from .serializers import UserSerializer, PostSerializer, CommentSerializer, LikeSerializer
 from singletons.logger_singleton import LoggerSingleton
 from factories.post_factory import PostFactory
 from django.shortcuts import get_object_or_404
 from .permissions import IsPostAuthor
+from django.db.models import Count
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
+
 
 
 # Initialize Logger
@@ -136,6 +140,7 @@ class PostDetailView(APIView):
         except Post.DoesNotExist:
             logger.error(f"Post with ID {pk} not found.")
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+        
 
     def put(self, request, pk):
         try:
@@ -187,28 +192,19 @@ class CommentListCreate(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    # Retrieves all comments.
-    def get(self, request):
-        comments = Comment.objects.all()
-        serializer = CommentSerializer(comments, many=True)
-
-        username = getattr(request.user, 'username', 'Anonymous')  # Handle unauthenticated users
-        logger.info(f"User '{username}' retrieved all comments.")  # Log the request
-
-        return Response(serializer.data)
-
     # Creates a new comment
-    def post(self, request):
+    def post(self, request, post_id):  # <-- Extracts post_id from URL
+        post = get_object_or_404(Post, id=post_id)  # Ensures post exists
         serializer = CommentSerializer(data=request.data)
+
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            logger.info(f"User '{request.user.username}' added a new comment.")
+            serializer.save(user=request.user, post=post)  # Saves comment with post reference
+            logger.info(f"User '{request.user.username}' added a comment to post {post_id}.")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         logger.error(f"Comment creation failed for user '{request.user.username}': {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
 
 class UserPostsView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -239,24 +235,72 @@ class OtherUserPostsView(APIView):
         serializer = PostSerializer(posts, many=True)
         logger.info(f"User '{request.user.username}' retrieved posts of '{user.username}'.")
         return Response(serializer.data)
-    
 
-class PostCommentsView(APIView):
+
+class CommentPagination(PageNumberPagination):
+    page_size = 5  # Default 5 comments per page
+    page_size_query_param = "page_size"
+    max_page_size = 20
+
+
+class PostCommentsView(ListAPIView):
+    serializer_class = CommentSerializer
+    pagination_class = CommentPagination
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    # Retrieve comments per post 
-    def get(self, request, post_id):
-        try:
-            post = Post.objects.get(pk=post_id)
-            comments = Comment.objects.filter(post=post)
-            serializer = CommentSerializer(comments, many=True)
-            logger.info(f"User '{request.user.username}' retrieved comments for post ID {post_id}.")
-            return Response(serializer.data)
-        except Post.DoesNotExist:
-            logger.error(f"Post with ID {post_id} not found.")
-            return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+    # retrieve comments per post
+    def get_queryset(self):
+        post_id = self.kwargs["post_id"]
+        post = get_object_or_404(Post, id=post_id)  # Ensure post exists
+        logger.info(f"User '{self.request.user.username}' retrieved comments for post ID {post_id}.")
+        return Comment.objects.filter(post=post)
+
+
+class LikePostView(APIView):
+    permission_classes = [IsAuthenticated]  
+
+    # like a post
+    def post(self, request, post_id):
+        # Get the post object
+        post = get_object_or_404(Post, id=post_id)
+
+        if Like.objects.filter(user=request.user, post=post).exists():
+            logger.info(f"User {request.user.username} tried to like post {post_id} again.")
+            return Response({"error": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+
+        like = Like.objects.create(user=request.user, post=post)
+        logger.info(f"User {request.user.username} liked post {post_id}.")
+        
+        serializer = LikeSerializer(like)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
+class UnlikePostView(APIView):
+
+    # unlike a post
+    def delete(self, request, post_id):
+        user = request.user  # Get the authenticated user
+        post = get_object_or_404(Post, id=post_id)  # Ensure the post exists
+
+        like = Like.objects.filter(user=user, post=post).first()  # Find existing like
+        if like:
+            like.delete()  # Remove the like
+            return Response({"message": "Post unliked successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "You haven't liked this post yet."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
 
+
+
+"""
+APIView -- Use try-except when in APIView because it doesn't handle exceptions automatically
+
+ListAPIView -- No need to use try-except because DRF automatically handles Http404 if the object doesn’t exist
+
+
+Use question mark (?) after endpoint which means it is query parameters
+
+"""
