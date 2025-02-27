@@ -2,75 +2,38 @@
 
 Below are the Postman request screenshots for reference:
 
-## 1. Create a comment (through post_id)
-<img src="https://https://github.com/user-attachments/assets/51837170-c9a9-4a7a-94a1-a98684d52ac6" width="500">
+## 1. Create a comment (through post_id)  
+<img src="https://github.com/user-attachments/assets/548e3789-b23c-48a5-959d-49fe7b6c4eaa" width="500">
 
 ---
 
-## 2. User Login
-<img src="https://github.com/user-attachments/assets/4555e585-b3b1-4983-bec6-e5c452e0add7" width="500">
+## 2. Retrieve all comments per post with pagination  
+<img src="https://github.com/user-attachments/assets/806c69dc-a4de-40c5-948f-0ef1d68e4252" width="500">
 
 ---
 
-## 3. Protected View (Authenticated Check)
-<img src="https://github.com/user-attachments/assets/1a369a2f-4d15-4c06-a3ee-506195f3650c" width="500">
+## 3. Like a post  
+<img src="https://github.com/user-attachments/assets/1397e09e-a5b0-42b3-953e-23f5fd587e51" width="500">
 
 ---
 
-## 4. Retrieve All Users
-<img src="https://github.com/user-attachments/assets/db989b22-9607-4ff5-9061-5fa9b0543117" width="500">
+## 4. Unlike a post  
+<img src="https://github.com/user-attachments/assets/2fb03083-dff5-47dd-ae76-13d511b68045" width="500">
 
 ---
 
-## 5. Retrieve All Posts
-<img src="https://github.com/user-attachments/assets/b33faa73-4573-4d52-a472-5baf998856d3" width="500">
+## 5. Comments Count and Likes Count  
+<img src="https://github.com/user-attachments/assets/b0851312-de9a-493c-8d02-d7609a39cfae" width="500">
 
 ---
 
-## 6. Create a New Post
-<img src="https://github.com/user-attachments/assets/a139bedf-3c6e-4ba8-b070-f87a0184ccb9" width="500">
+## 6. Liking a post multiple times  
+<img src="https://github.com/user-attachments/assets/a05f2a4f-df0e-4bd4-a94b-5614808a6975" width="500">
 
 ---
 
-## 7. Retrieve a Specific Post
-<img src="https://github.com/user-attachments/assets/2f605881-ea5e-4e16-acce-3ee98014416e" width="500">
+## 7. Adding a comment to a post that doesn’t exist  
+<img src="https://github.com/user-attachments/assets/f569a75f-6a72-4841-8d88-e0d0a2f28f37" width="500">
 
----
 
-## 8. Update a Post
-<img src="https://github.com/user-attachments/assets/49c3ebf6-9aa5-498c-b718-3db2172b06c3" width="500">
-
----
-
-## 9. Delete a Post
-<img src="https://github.com/user-attachments/assets/f6b22a9d-e700-421b-bbff-84ede71ae388" width="500">
-
----
-
-## 10. Retrieve All Comments
-<img src="https://github.com/user-attachments/assets/cde7389e-c20c-4b1e-82de-d4f2bc1c9bf9" width="500">
-
----
-
-## 11. Create a New Comment
-<img src="https://github.com/user-attachments/assets/adff67e4-bb8a-4b44-9b8a-0a5c51a3983c" width="500">
-
----
-
-## 12. Retrieve Posts by Authenticated User
-<img src="https://github.com/user-attachments/assets/c00e08fa-a004-4365-8723-4709af63cbd5" width="500">
-
----
-
-## 13. Retrieve Posts by Username
-<img src="https://github.com/user-attachments/assets/c982f644-18a2-4805-9223-86428b1a2e3e" width="500">
-
----
-
-## 14. Retrieve Comments for a Specific Post
-<img src="https://github.com/user-attachments/assets/3903b41e-c6c7-472e-a21c-5018fbd8724d" width="500">
-
----
-
-## 15. Get Posts by Another User
-<img src="https://github.com/user-attachments/assets/6d93226b-0352-4744-9be2-107ed1db72a5" width="500">
+when creating comment or like, the postid must be included ib=n the url
