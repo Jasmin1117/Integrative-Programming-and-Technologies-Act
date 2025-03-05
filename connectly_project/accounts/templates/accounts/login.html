@@ -1,0 +1,14 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center min-h-screen">
+    <div class="bg-white p-8 shadow-lg rounded-lg w-96">
+        <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+        <a href="{% provider_login_url 'google' %}" class="bg-blue-500 text-white px-6 py-2 rounded w-full block text-center">
+            Login with Google
+        </a>
+    </div>
+</div>
+{% endblock %}
