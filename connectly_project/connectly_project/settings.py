@@ -38,6 +38,13 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
 
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.MySocialAccountAdapter'
 
@@ -48,6 +55,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
 
@@ -73,7 +81,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
     'allauth.account.middleware.AccountMiddleware' #https://stackoverflow.com/questions/77012106/django-allauth-modulenotfounderror-no-module-named-allauth-account-middlewar
 ]
 

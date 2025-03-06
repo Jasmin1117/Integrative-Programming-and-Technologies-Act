@@ -1,4 +1,7 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+
+User = get_user_model()
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
