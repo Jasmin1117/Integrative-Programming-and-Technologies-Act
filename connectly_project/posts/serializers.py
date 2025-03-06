@@ -1,23 +1,27 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from accounts.adapters import User
 from .models import Post, Comment, Like
 
-# User Serializer
+CustomUser = get_user_model()
+
+# Custom User Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'username', 'email']  # Exclude sensitive fields like password
+        model = CustomUser
+        fields = ['id', 'username', 'email']
 
     def validate_email(self, value):
         """Ensure email is unique"""
-        if User.objects.filter(email=value).exists():
+        if CustomUser.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         return value
 
 # Post Serializer
 class PostSerializer(serializers.ModelSerializer):
-    author_id = serializers.PrimaryKeyRelatedField(source="created_by", read_only=True)  
-    author_username = serializers.CharField(source="created_by.username", read_only=True)  
+    author_id = serializers.PrimaryKeyRelatedField(source="created_by", read_only=True)
+    author_username = serializers.CharField(source="created_by.username", read_only=True)
     like_count = serializers.SerializerMethodField() 
     comment_count = serializers.SerializerMethodField() 
 
