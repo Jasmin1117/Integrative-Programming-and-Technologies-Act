@@ -10,7 +10,9 @@ from .views import (
     PostCommentsView,
     OtherUserPostsView,
     LikePostView,
-    UnlikePostView
+    UnlikePostView,
+    NewsFeedView,
+    
 )
 
 urlpatterns = [
@@ -25,7 +27,8 @@ urlpatterns = [
     path('users/<int:user_id>/posts/', OtherUserPostsView.as_view(), name='other-user-posts-by-id'),
     path('users/<str:username>/posts/', OtherUserPostsView.as_view(), name='other-user-posts-by-username'),
     path('posts/<int:post_id>/like/', LikePostView.as_view(), name='like_post'),
-    path('posts/<int:post_id>/unlike/', UnlikePostView.as_view(), name='unlike-post')
+    path('posts/<int:post_id>/unlike/', UnlikePostView.as_view(), name='unlike-post'),
+    path('feed/', NewsFeedView.as_view(), name='news-feed'),
     
 ]
 
@@ -53,14 +56,13 @@ note: example to test comments with pagination ( https://127.0.0.1:8000/posts/po
 - user can like a post           :  path('posts/<int:post_id>/like/', LikePostView.as_view(), name='like_post')
 - user can unlike a post         :  path('posts/<int:post_id>/unlike/', UnlikePostView.as_view(), name='unlike-post')
 
+- retrieve newsfeed newest first   : path('feed/', NewsFeedView.as_view(), name='news-feed')
 
 
 
-not yet..
-- Implement pagination for the GET /posts/{id}/comments endpoint to handle large datasets efficiently.
 
 
-(optional only) not yet..
+
 - user can get specific post of a specific user      
 - user can delete comments on its own post
 - user can edit its own comment

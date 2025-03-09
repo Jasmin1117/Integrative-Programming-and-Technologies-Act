@@ -294,16 +294,31 @@ class UnlikePostView(APIView):
             return Response({"error": "You haven't liked this post yet."}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PostPagination(PageNumberPagination):
+    page_size = 10  # Number of posts per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+class NewsFeedView(ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+    pagination_class = PostPagination
+
+    def get_queryset(self):
+        # Retrieves posts for the news feed, with optional filtering and sorting.
+        logger.info(f"User '{self.request.user.username}' accessed the news feed.")
+
+        queryset = Post.objects.all().order_by('-created_at').prefetch_related('comments') # Sort by date and prefetch comments
+
+        liked_only = self.request.query_params.get('liked_only')
+
+        if liked_only and liked_only.lower() == 'true':
+            logger.info(f"User '{self.request.user.username}' requested liked-only posts.")
+            liked_posts = Like.objects.filter(user=self.request.user).values_list('post_id', flat=True)
+            queryset = queryset.filter(id__in=liked_posts).prefetch_related('comments')
+            if not queryset:
+                logger.info(f"User '{self.request.user.username}' has no liked posts.")
+        return queryset
 
 
-
-
-"""
-APIView -- Use try-except when in APIView because it doesn't handle exceptions automatically
-
-ListAPIView -- No need to use try-except because DRF automatically handles Http404 if the object doesn’t exist
-
-
-Use question mark (?) after endpoint which means it is query parameters
-
-"""

@@ -53,6 +53,10 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_comment_count(self, obj):
         return obj.comments.count()
+    
+    def get_comments(self, obj):
+        comments = obj.comments.order_by('-created_at')  # Newest comments first
+        return CommentSerializer(comments, many=True).data
 
 # Comment Serializer
 class CommentSerializer(serializers.ModelSerializer):
