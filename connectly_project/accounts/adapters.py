@@ -28,8 +28,6 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
             if email_domain == "mmdc.mcl.edu.ph" or user.email in [
                 'admin@example.com',
                 'owner@example.com',
-                'lr.jabejo@mmdc.mcl.edu.ph',
-                'jomariabejo@gmail.com'
             ]:
                 user.role = 'admin'
             else:
