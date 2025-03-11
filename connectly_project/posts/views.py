@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.http import JsonResponse
 
 User = get_user_model()
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from .models import Post, Comment, Like
@@ -14,9 +15,8 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Like
 from singletons.logger_singleton import LoggerSingleton
 from factories.post_factory import PostFactory
 from django.shortcuts import get_object_or_404
-from .permissions import IsPostAuthor
-from django.db.models import Count
-from rest_framework.generics import ListAPIView
+from .permissions import IsPostAuthor, IsAuthorOrAdmin
+from rest_framework.generics import ListAPIView, DestroyAPIView
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -134,11 +134,15 @@ class PostListCreate(APIView):
 
 class PostDetailView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, IsPostAuthor]
+    permission_classes = [IsAuthenticated, IsAuthorOrAdmin]
 
     def get(self, request, pk):
         try:
-            post = Post.objects.get(pk=pk)
+            post = get_object_or_404(Post, pk=pk)
+
+            # Check permissions before returning post details
+            self.check_object_permissions(request, post)
+
             return Response(PostSerializer(post).data)
         except Post.DoesNotExist:
             logger.error(f"Post with ID {pk} not found.")
@@ -207,7 +211,14 @@ class CommentListCreate(APIView):
 
         logger.error(f"Comment creation failed for user '{request.user.username}': {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class CommentDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthorOrAdmin]
+
+    def delete(self, request, post_id, comment_id, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+        comment.delete()
+        return Response({"message": "Comment deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 class UserPostsView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -306,19 +317,27 @@ class NewsFeedView(ListAPIView):
     pagination_class = PostPagination
 
     def get_queryset(self):
-        # Retrieves posts for the news feed, with optional filtering and sorting.
         logger.info(f"User '{self.request.user.username}' accessed the news feed.")
 
-        queryset = Post.objects.all().order_by('-created_at').prefetch_related('comments') # Sort by date and prefetch comments
+        # Restrict guest users to only public posts
+        try:
+            if self.request.user.role == 'guest':
+                queryset = Post.objects.filter(privacy='public')
+                logger.info(f"Guest user '{self.request.user.username}' can only see public posts.")
+            else:
+                queryset = Post.objects.filter(privacy='public') | Post.objects.filter(user=self.request.user)
+        except:
+            queryset = Post.objects.filter(privacy='public')
 
+        # Sorting and prefetching comments
+        queryset = queryset.order_by('-created_at').prefetch_related('comments')
+
+        # Handle liked-only filtering
         liked_only = self.request.query_params.get('liked_only')
-
         if liked_only and liked_only.lower() == 'true':
-            logger.info(f"User '{self.request.user.username}' requested liked-only posts.")
             liked_posts = Like.objects.filter(user=self.request.user).values_list('post_id', flat=True)
-            queryset = queryset.filter(id__in=liked_posts).prefetch_related('comments')
-            if not queryset:
+            queryset = queryset.filter(id__in=liked_posts)
+            logger.info(f"User '{self.request.user.username}' requested liked-only posts.")
+            if not queryset.exists():
                 logger.info(f"User '{self.request.user.username}' has no liked posts.")
         return queryset
-
-

@@ -11,8 +11,8 @@ from .views import (
     OtherUserPostsView,
     LikePostView,
     UnlikePostView,
-    NewsFeedView,
-    
+    NewsFeedView, CommentDeleteView,
+
 )
 
 urlpatterns = [
@@ -21,9 +21,10 @@ urlpatterns = [
     path('login/', UserLogin.as_view(), name='user-login'),
     path('posts/', PostListCreate.as_view(), name='post-list-create'),
     path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
-    path('posts/<int:post_id>/comments/', CommentListCreate.as_view(), name='comment-list-create'),     
+    path('posts/<int:post_id>/comments/', CommentListCreate.as_view(), name='comment-list-create'),
     path('user/posts/', UserPostsView.as_view(), name='user-posts'),
     path('post/<int:post_id>/comments/', PostCommentsView.as_view(), name='post-comments'),
+    path('posts/<int:post_id>/comments/<int:comment_id>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
     path('users/<int:user_id>/posts/', OtherUserPostsView.as_view(), name='other-user-posts-by-id'),
     path('users/<str:username>/posts/', OtherUserPostsView.as_view(), name='other-user-posts-by-username'),
     path('posts/<int:post_id>/like/', LikePostView.as_view(), name='like_post'),

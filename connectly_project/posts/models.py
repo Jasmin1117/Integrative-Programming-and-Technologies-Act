@@ -10,12 +10,18 @@ class Post(models.Model):
         ('video', 'Video'),
     )
 
+    PRIVACY_CHOICES = (
+        ('public', 'Public'),
+        ('private', 'Private'),
+    )
+
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True)
     post_type = models.CharField(max_length=10, choices=POST_TYPES)
     metadata = models.JSONField(default=dict)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts')
     created_at = models.DateTimeField(auto_now_add=True)
+    privacy = models.CharField(max_length=10, choices=PRIVACY_CHOICES, default='public')
 
     def __str__(self):
         return f"{self.title} by {self.created_by.username}"
