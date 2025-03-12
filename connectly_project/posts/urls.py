@@ -45,6 +45,7 @@ urlpatterns = [
 - user can retrieve its own post (authenticated)                                : path('user/posts/', UserPostsView.as_view(), name='user-posts'),
 - user can retrieve ALL posts                                                   : path('posts/', PostListCreate.as_view(), name='post-list-create'),
 - user can retrieve  ALL post of a specific user (through user id / username)   : path('users/<int:user_id>/posts/', OtherUserPostsView.as_view(), name='other-user-posts-by-id')   //////and/////   path('users/<str:username>/posts/', OtherUserPostsView.as_view(), name='other-user-posts-by-username')
+- user can get a specific post                                                  : path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail')
 - user can edit its own post                                                    : path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail')
 - user can delete its own post                                                  : path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail')
 
@@ -58,6 +59,7 @@ note: example to test comments with pagination ( https://127.0.0.1:8000/posts/po
 - user can unlike a post         :  path('posts/<int:post_id>/unlike/', UnlikePostView.as_view(), name='unlike-post')
 
 - retrieve newsfeed newest first   : path('feed/', NewsFeedView.as_view(), name='news-feed')
+- retrieve liked ppsts : feed/?liked_only=true 
 
 
 

@@ -62,6 +62,10 @@ class UserListCreate(APIView):
             return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.create_user(username=username, email=email, password=password)
+        if role == "Admin":
+            user.is_staff = True
+        else:   
+            user.is_staff = False
         user.save()
 
         valid_roles = ["Admin", "User"]
@@ -139,8 +143,6 @@ class PostDetailView(APIView):
     def get(self, request, pk):
         try:
             post = get_object_or_404(Post, pk=pk)
-
-            # Check permissions before returning post details
             self.check_object_permissions(request, post)
 
             return Response(PostSerializer(post).data)
@@ -151,8 +153,9 @@ class PostDetailView(APIView):
 
     def put(self, request, pk):
         try:
-            post = Post.objects.get(pk=pk)
-            # No need to check if user is Admin or if the user is the author, IsPostAuthor does that
+            post = get_object_or_404(Post, pk=pk)
+            self.check_object_permissions(request, post)
+            
             serializer = PostSerializer(post, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -167,28 +170,12 @@ class PostDetailView(APIView):
 
     def delete(self, request, pk):
         try:
-            post = Post.objects.get(pk=pk)
-            # The IsPostAuthor permission will automatically check if the user is the author
+            post = get_object_or_404(Post, pk=pk)
+            self.check_object_permissions(request, post)
+            
             post.delete()
             logger.info(f"User '{request.user.username}' deleted post ID {pk}.")
             return Response({"message": "Post deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-        except Post.DoesNotExist:
-            logger.error(f"Post with ID {pk} not found.")
-            return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
-
-
-    # Deletes a post
-    def delete(self, request, pk):
-        try:
-            post = Post.objects.get(pk=pk)
-
-            if request.user.groups.filter(name="Admin").exists() or post.created_by == request.user:
-                post.delete()
-                logger.info(f"User '{request.user.username}' deleted post ID {pk}.")
-                return Response({"message": "Post deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-            
-            logger.warning(f"User '{request.user.username}' attempted to delete another user's post.")
-            return Response({"error": "You do not have permission to delete this post."}, status=status.HTTP_403_FORBIDDEN)
         except Post.DoesNotExist:
             logger.error(f"Post with ID {pk} not found.")
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -217,8 +204,11 @@ class CommentDeleteView(DestroyAPIView):
 
     def delete(self, request, post_id, comment_id, *args, **kwargs):
         comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+        self.check_object_permissions(request, comment) 
         comment.delete()
         return Response({"message": "Comment deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+
 
 class UserPostsView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -341,3 +331,18 @@ class NewsFeedView(ListAPIView):
             if not queryset.exists():
                 logger.info(f"User '{self.request.user.username}' has no liked posts.")
         return queryset
+    
+
+
+
+"""
+test if
+admin can delete other posts
+admin can delete other comments
+
+user cannot delete other posts
+user cannot delete other comments
+
+
+
+"""
