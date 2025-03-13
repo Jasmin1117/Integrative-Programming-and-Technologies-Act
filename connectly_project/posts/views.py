@@ -64,22 +64,21 @@ class UserListCreate(APIView):
         user = User.objects.create_user(username=username, email=email, password=password)
         if role == "Admin":
             user.is_staff = True
-        else:   
+            user.role = "admin"
+        elif role== "User":   
             user.is_staff = False
+            user.role = "user"
+        else:
+            user.is_staff = False
+            user.role = "user"
+            logger.warning(f"Invalid role provided: {role}. Defaulting to user.")
         user.save()
 
-        valid_roles = ["Admin", "User"]
-        if role not in valid_roles:
-            logger.warning(f"User '{username}' attempted to register with an invalid role: {role}")
-            return Response({"error": "Invalid role. Choose 'Admin' or 'User'."}, status=status.HTTP_400_BAD_REQUEST)
-
-        group, _ = Group.objects.get_or_create(name=role)
-        user.groups.add(group)
-
         logger.info(f"New user '{username}' registered successfully with role '{role}'.")
+        serializer = UserSerializer(user)
         return Response({
             "message": "User created successfully.",
-            "role": role
+            "user": serializer.data,
         }, status=status.HTTP_201_CREATED)
 
 
