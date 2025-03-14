@@ -166,25 +166,37 @@ User successfully deleted their own post
 
 ### Test Case ID: TC-USER-POST-DELETE-005
 **Feature:** User Unauthorized Post Deletion
+
 **Description:** Verify a user cannot delete another user's post.
+
 **Preconditions:**
   - User is authenticated with a valid authorization token.
-  - Post 3 exists and is owned by another user.
+  - Post 23 exists and is owned by another user.
+    
 **Test Steps:**
-  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/3/`.
+  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/23/`.
   2. Include a valid authentication token.
   3. Send the request.
   4. Check the "Status" code.
-  5. Verify post 3 still exists.
+  5. Verify post 23 still exists.
+
 **Expected Result:**
   - Status: 403 (Forbidden).
-  - Post 3 not deleted.
+  - Post 23 not deleted.
 
 **Actual Result:**
 
-**Database Update:**
+Post created by user 'Roy":
 
-**Status**: 
+<img src="https://github.com/user-attachments/assets/ba64589a-ddf3-402e-8687-b3f55394451b" width="500">
+
+User 'Jakob' tried to delete a post belonging to user 'Roy'
+
+<img src="https://github.com/user-attachments/assets/b2e46d51-419e-4749-b6f1-49a69fa2f844" width="500">
+
+The user, Jakob, was successfully prevented from deleting another user's post
+
+**Status**: Pass✅
 
 ### Test Case ID: TC-USER-POST-VISIBILITY-006  
 **Feature:** Post Privacy (Public & Private)  
@@ -211,82 +223,142 @@ User successfully deleted their own post
 
 **Actual Result:**  
 
+Roy created a post with "private" visibility.
+
+<img src="https://github.com/user-attachments/assets/6198b2d0-a34e-4544-ab4f-71a7660e628a" width="500">
+
+A user's newsfeed does not show the private post created by Roy
+
+<img src="https://github.com/user-attachments/assets/1ce39c69-ac97-48b4-9469-2a6236d06d22" width="500">
+
+Roy's newsfeed shows his own private post.
+
+<img src="https://github.com/user-attachments/assets/00752c84-c641-4ee1-9158-42ff27cb416e" width="500">
+
 
 **Database Update:**  
 
+<img src="https://github.com/user-attachments/assets/175ab0e3-99b8-4f57-921f-2e85f6a9bb14" width="500">
 
-**Status**: 
+Private post successfully visible only to its author.
+
+**Status**: Pass✅
 
 
 ## 3. Comment Management
 
 ### Test Case ID: TC-ADMIN-COMMENT-DELETE-007
 **Feature:** Admin Comment Deletion
+
 **Description:** Verify an admin can delete any comment.
+
 **Preconditions:**
   - Admin user is authenticated with a valid authorization token.
-  - Comment 1 exists.
+  - Comment 20 exists in post 23
+    
 **Test Steps:**
-  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/{post_id}/comments/{comment_id}/delete/`.
+  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/23/comments/20/delete/`.
   2. Include a valid authentication token.
   3. Send the request.
   4. Check the "Status" code.
-  5. Verify comment 1 is deleted.
+  5. Verify comment 20 is deleted.
+     
 **Expected Result:**
   - Status: 204 (No Content).
-  - Comment 1 deleted.
+  - Comment 23 deleted.
 
 **Actual Result:**
 
+Comment created by user 'Jakob":
+
+<img src="https://github.com/user-attachments/assets/f546a97c-83f4-432b-8966-899d79b58e73" width="500">
+
+Comment deleted by admin 'Belle,':
+
+<img src="https://github.com/user-attachments/assets/0515cdb9-455e-47d7-87fc-19e639df3c89" width="500">
+
 **Database Update:**
 
-**Status**: 
+<img src="https://github.com/user-attachments/assets/fce2c816-6c76-4f59-a172-fec26abe9de4" width="700">
+
+Admin successfully deleted any comment from a regular user
+
+**Status**: Pass✅
 
 
 ### Test Case ID: TC-USER-COMMENT-DELETE-008
 **Feature:** User Own Comment Deletion
+
 **Description:** Verify a user can delete their own comment.
+
 **Preconditions:**
   - User is authenticated with a valid authorization token.
-  - Comment 2 exists and is owned by the user.
+  - Comment 20 exists and is owned by the user.
+    
 **Test Steps:**
-  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/{post_id}/comments/{comment_id}/delete/`.
+  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/23/comments/22/delete/`.
   2. Include a valid authentication token.
   3. Send the request.
   4. Check the "Status" code.
-  5. Verify comment 2 is deleted.
+  5. Verify comment 22 is deleted.
+     
 **Expected Result:**
   - Status: 204 (No Content).
-  - Comment 2 deleted.
+  - Comment 22 deleted.
 
 **Actual Result:**
 
+Comment created by user 'Roy":
+
+<img src="https://github.com/user-attachments/assets/177d9161-d473-4497-a0ae-708f478cd54e" width="500">
+
+User 'Roy' deleted his own comment:
+
+<img src="https://github.com/user-attachments/assets/97fb516b-a295-4ab1-aae1-cc90c981a22f" width="500">
+
 **Database Update:**
 
-**Status**: 
+<img src="https://github.com/user-attachments/assets/c2d19c28-d8d9-49d0-84f8-be2eb22639c7" width="700">
+
+User successfully deleted their own comment
+
+**Status**: Pass✅
 
 
 ### Test Case ID: TC-USER-COMMENT-DELETE-009
 **Feature:** User Unauthorized Comment Deletion
+
 **Description:** Verify a user cannot delete another user's comment.
+
 **Preconditions:**
   - User is authenticated with a valid authorization token.
-  - Comment 3 exists and is owned by another user.
+  - Comment 25 exists and is owned by another user.
+    
 **Test Steps:**
-  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/{post_id}/comments/{comment_id}/delete/`.
+  1. Create a DELETE request to `http://127.0.0.1:8000/posts/posts/23/comments/25/delete/`.
   2. Include a valid authentication token.
   3. Send the request.
   4. Check the "Status" code.
-  5. Verify comment 3 still exists.
+  5. Verify comment 25 still exists.
+     
 **Expected Result:**
   - Status: 403 (Forbidden).
-  - Comment 3 not deleted.
+  - Comment 25 not deleted.
 
 **Actual Result:**
 
-**Database Update:**
+Comment created by user 'Roy":
 
-**Status**: 
+<img src="https://github.com/user-attachments/assets/3e71ff9f-f597-4613-8446-a46b50b9b423" width="500">
+
+User 'Jakob' tried to delete a post belonging to user 'Roy'
+
+<img src="https://github.com/user-attachments/assets/4a566c94-49d9-44de-8b83-f7f577d40a13" width="500">
+
+
+The user, Jakob, was successfully prevented from deleting another user's comment
+
+**Status**: Pass✅
 
 
 ---
