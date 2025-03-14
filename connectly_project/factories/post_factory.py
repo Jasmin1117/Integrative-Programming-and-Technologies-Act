@@ -2,7 +2,7 @@ from posts.models import Post
 
 class PostFactory:
     @staticmethod
-    def create_post(post_type, title, content='', metadata=None, created_by=None):
+    def create_post(post_type, title, content='', metadata=None, created_by=None, privacy='public'): 
         if metadata is None:
             metadata = {}
 
@@ -21,5 +21,6 @@ class PostFactory:
             content=content,
             post_type=post_type,
             metadata=metadata,
-            created_by=created_by  # Ensure this is passed
+            created_by=created_by,
+            privacy=privacy 
         )
