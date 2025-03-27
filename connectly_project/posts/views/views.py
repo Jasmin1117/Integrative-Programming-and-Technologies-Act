@@ -1,22 +1,19 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
-from django.http import JsonResponse
 from django.contrib.auth import authenticate
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .models import Post, Comment, Like
-from .serializers import UserSerializer, PostSerializer, CommentSerializer, LikeSerializer
-from singletons.logger_singleton import LoggerSingleton
-from factories.post_factory import PostFactory
-from django.shortcuts import get_object_or_404
-from .permissions import IsPostAuthor, IsPostAuthorOrAdmin, IsCommentAuthorOrAdmin
 from rest_framework.generics import ListAPIView, DestroyAPIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from posts.models import Post, Like, Comment
+from posts.permissions import IsPostAuthor, IsPostAuthorOrAdmin, IsCommentAuthorOrAdmin
+from posts.serializers import UserSerializer, PostSerializer, CommentSerializer, LikeSerializer
+from singletons.logger_singleton import LoggerSingleton
 
 # Get the user model
 User = get_user_model()
@@ -41,7 +38,7 @@ class ProtectedView(APIView):
 
 class UserListCreate(APIView):
     """Handles user registration and listing."""
-    permission_classes = [AllowAny] # Anyone can register
+    permission_classes = [AllowAny]  # Anyone can register
 
     def get(self, request):
         """Lists all registered users."""
@@ -68,7 +65,7 @@ class UserListCreate(APIView):
         if role == "Admin":
             user.is_staff = True
             user.role = "admin"
-        elif role== "User":   
+        elif role == "User":
             user.is_staff = False
             user.role = "user"
         else:
@@ -85,7 +82,6 @@ class UserListCreate(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
-
 class UserLogin(APIView):
     """Handles user login and token generation."""
     permission_classes = [AllowAny]
@@ -100,7 +96,7 @@ class UserLogin(APIView):
             token, _ = Token.objects.get_or_create(user=user)
             logger.info(f"User '{username}' logged in successfully.")
             return Response({"message": "Login successful.", "token": token.key}, status=status.HTTP_200_OK)
-        
+
         logger.warning(f"Failed login attempt for user '{username}'.")
         return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -110,77 +106,41 @@ class UserLogin(APIView):
 
 class PostPagination(PageNumberPagination):
     """Handles post pagination settings."""
-    page_size = 10  
+    page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+
 class CommentPagination(PageNumberPagination):
     """Handles comment pagination settings."""
-    page_size = 5  
+    page_size = 5
     page_size_query_param = "page_size"
     max_page_size = 20
-
-
-# --- Post Management ---
-
-
-class PostListCreate(APIView):
-    """Handles listing and creating posts."""
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        """Retrieves all posts."""
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
-        
-        logger.info(f"User '{request.user.username}' retrieved all posts.")  # Add this log
-        return Response(serializer.data)
-    
-    def post(self, request):
-        """Creates a new post."""
-        data = request.data  
-        try:
-            post = PostFactory.create_post(
-                post_type=data['post_type'],
-                title=data['title'],
-                content=data.get('content', ''),
-                metadata=data.get('metadata', {}),
-                created_by=request.user,
-                privacy=data.get('privacy', 'public')
-            )
-            
-            serializer = PostSerializer(post)  # Serialize response
-            logger.info(f"User '{request.user.username}' created a new {data['post_type']} post.")
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        except ValueError as e:
-            logger.warning(f"Post creation failed for user '{request.user.username}': {str(e)}")
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PostDetailView(APIView):
     """Handles viewing, updating, and deleting individual posts."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsPostAuthor]
 
     def get(self, request, pk):
         """Retrieves a specific post."""
         try:
             post = get_object_or_404(Post, pk=pk)
+            self.check_object_permissions(request, post)
             return Response(PostSerializer(post).data)
         except Post.DoesNotExist:
             logger.error(f"Post with ID {pk} not found.")
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
-        
 
     def put(self, request, pk):
         """Updates a specific post (only author can update)."""
         try:
             post = get_object_or_404(Post, pk=pk)
-            if not IsPostAuthor().has_object_permission(request, self, post): #changed here.
-                return Response({'detail': 'You do not have permission to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
-            
+            if not IsPostAuthor().has_object_permission(request, self, post):  #changed here.
+                return Response({'detail': 'You do not have permission to perform this action.'},
+                                status=status.HTTP_403_FORBIDDEN)
+
             serializer = PostSerializer(post, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -198,15 +158,16 @@ class PostDetailView(APIView):
         try:
             post = get_object_or_404(Post, pk=pk)
             if not IsPostAuthorOrAdmin().has_object_permission(request, self, post):
-                return Response({'detail': 'You do not have permission to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
-            
+                return Response({'detail': 'You do not have permission to perform this action.'},
+                                status=status.HTTP_403_FORBIDDEN)
+
             post.delete()
             logger.info(f"User '{request.user.username}' deleted post ID {pk}.")
             return Response({"message": "Post deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
         except Post.DoesNotExist:
             logger.error(f"Post with ID {pk} not found.")
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+
 
 class NewsFeedView(ListAPIView):
     """Handles retrieving the news feed with pagination and filtering."""
@@ -215,7 +176,7 @@ class NewsFeedView(ListAPIView):
     serializer_class = PostSerializer
     pagination_class = PostPagination
 
-    def get_queryset(self): 
+    def get_queryset(self):
         """Retrieves posts for the news feed. (Public and private posts by the author)."""
         logger.info(f"User '{self.request.user.username}' accessed the news feed.")
 
@@ -241,7 +202,7 @@ class NewsFeedView(ListAPIView):
             if not queryset.exists():
                 logger.info(f"User '{self.request.user.username}' has no liked posts.")
         return queryset
-    
+
 
 # --- Comment Management ---
 
@@ -251,10 +212,10 @@ class CommentListCreate(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    
-    def post(self, request, post_id):  
+
+    def post(self, request, post_id):
         """Creates a comment on a specific post. """
-        post = get_object_or_404(Post, id=post_id)  
+        post = get_object_or_404(Post, id=post_id)
         serializer = CommentSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -272,7 +233,7 @@ class CommentDeleteView(DestroyAPIView):
     def delete(self, request, post_id, comment_id, *args, **kwargs):
         """Deletes a specific comment. (only author or admin can delete)"""
         comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-        self.check_object_permissions(request, comment) 
+        self.check_object_permissions(request, comment)
         comment.delete()
         return Response({"message": "Comment deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
@@ -317,11 +278,10 @@ class PostCommentsView(ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-
     def get_queryset(self):
         """Retrieves comments for a specific post."""
         post_id = self.kwargs["post_id"]
-        post = get_object_or_404(Post, id=post_id)  
+        post = get_object_or_404(Post, id=post_id)
         logger.info(f"User '{self.request.user.username}' retrieved comments for post ID {post_id}.")
         return Comment.objects.filter(post=post)
 
@@ -331,9 +291,8 @@ class PostCommentsView(ListAPIView):
 
 class LikePostView(APIView):
     """Handles liking a post."""
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
 
-    
     def post(self, request, post_id):
         """Likes a specific post."""
         post = get_object_or_404(Post, id=post_id)
@@ -344,23 +303,22 @@ class LikePostView(APIView):
 
         like = Like.objects.create(user=request.user, post=post)
         logger.info(f"User {request.user.username} liked post {post_id}.")
-        
+
         serializer = LikeSerializer(like)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
 
 class UnlikePostView(APIView):
     """Handles unliking a post."""
 
     def delete(self, request, post_id):
         """Unlikes a specific post."""
-        user = request.user  
-        post = get_object_or_404(Post, id=post_id)  
+        user = request.user
+        post = get_object_or_404(Post, id=post_id)
 
-        like = Like.objects.filter(user=user, post=post).first()  
+        like = Like.objects.filter(user=user, post=post).first()
         if like:
-            like.delete()  
+            like.delete()
             return Response({"message": "Post unliked successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "You haven't liked this post yet."}, status=status.HTTP_400_BAD_REQUEST)
-

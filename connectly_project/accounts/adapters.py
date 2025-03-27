@@ -5,6 +5,7 @@ import logging
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         user = sociallogin.user

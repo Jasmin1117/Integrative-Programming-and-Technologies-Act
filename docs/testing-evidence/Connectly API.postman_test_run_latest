@@ -1,0 +1,550 @@
+{
+	"id": "6f5f7db8-d6bb-460e-8281-7276846ffb31",
+	"name": "Connectly API",
+	"timestamp": "2025-03-27T06:06:07.947Z",
+	"collection_id": "34965255-ce5caf88-abbf-415d-905e-e410f7935aa9",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 0,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-03-27T06:06:05.037Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "7b0e6967-0a98-4109-9ce9-aa432edb5720",
+			"name": "Create New User",
+			"url": "https://127.0.0.1:8000/posts/users/",
+			"time": 11,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "b2e91b4f-33ac-4e4e-b5b8-a51492bf3c49",
+			"name": "Retrieve User List",
+			"url": "https://127.0.0.1:8000/posts/users/",
+			"time": 9,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "d43b9fa6-6f66-440f-a30f-e0d6b03fb7ca",
+			"name": "Protected Endpoint",
+			"url": "https://127.0.0.1:8000/posts/protected/",
+			"time": 11,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "e66092d9-e152-49e3-a0fd-3190bcfce04b",
+			"name": "Handles user login and token generation",
+			"url": "https://127.0.0.1:8000/posts/login/",
+			"time": 122,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				122
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "940473ce-d6d7-46ac-aca0-5347c92ba5be",
+			"name": "Retrieve All Posts",
+			"url": "https://127.0.0.1:8000/posts/posts/",
+			"time": 22,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				22
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "6a096885-cf6b-4f55-99cf-5700ef08bb7c",
+			"name": "Retrieve Private Posts (User can see own private posts)",
+			"url": "https://127.0.0.1:8000/posts/posts/private/",
+			"time": 11,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				11
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "45f63417-cc7e-4698-80c1-3ecda0db274c",
+			"name": "Retrieve Public Posts",
+			"url": "https://127.0.0.1:8000/posts/posts/",
+			"time": 26,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				26
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "1ec50043-e349-4669-83ed-0929c2ac5d39",
+			"name": "Create a New Post",
+			"url": "https://127.0.0.1:8000/posts/manage/29/",
+			"time": 9,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "8a3293fe-49a7-4d2d-be62-ad1c69792f24",
+			"name": "Updates a specific post (only author can update).",
+			"url": "https://127.0.0.1:8000/posts/posts/{pk}",
+			"time": 27,
+			"responseCode": {
+				"code": 500,
+				"name": "INTERNAL SERVER ERROR"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				27
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "c0c63d8c-be7d-419d-bba1-689071cbd117",
+			"name": "Retrieve Specific Posts",
+			"url": "https://127.0.0.1:8000/posts/posts/2",
+			"time": 10,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				10
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "02216774-8711-4f11-86be-379c5a2c5785",
+			"name": "User is not allowed to view other users' private posts",
+			"url": "https://127.0.0.1:8000/posts/posts/25/",
+			"time": 9,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "a7df5bf2-cde3-449b-988b-dd6d1e6a4788",
+			"name": "Deletes a specific post (only author or admin can delete)",
+			"url": "https://127.0.0.1:8000/posts/manage/26/",
+			"time": 9,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "043a2a76-1661-4724-b1e5-b1ccf68450e8",
+			"name": "Creates a comment on a specific post",
+			"url": "https://127.0.0.1:8000/posts/posts/32/comments/",
+			"time": 9,
+			"responseCode": {
+				"code": 405,
+				"name": "Method Not Allowed"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "f7d10d70-8068-427f-8219-b3007eb117dd",
+			"name": "Retrieves comment on a specific post",
+			"url": "https://127.0.0.1:8000/posts/posts/32/comments/",
+			"time": 9,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "825ea1ff-9bcc-4684-94f3-4da9dbdbbc28",
+			"name": "Retrieves posts created by the authenticated user.",
+			"url": "https://127.0.0.1:8000/posts/users/22/posts/",
+			"time": 14,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				14
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "fea743c1-904c-4a92-b9d4-49030539432b",
+			"name": "Retrieves posts created by user by username",
+			"url": "https://127.0.0.1:8000/posts/users/Roy/posts/",
+			"time": 14,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				14
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "ca698143-9728-4249-9a7a-43d3a9a38289",
+			"name": "Deletes a specific comment. (only author or admin can delete)",
+			"url": "https://127.0.0.1:8000/posts/posts/32/comments/28/delete/",
+			"time": 9,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "ee12214e-f243-45ff-8db9-2489e8e49e63",
+			"name": "Retrieves posts created by a specific user (by ID or username).",
+			"url": "https://127.0.0.1:8000/posts/users/22/posts",
+			"time": 15,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				15
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "f049861c-eafe-4ae5-964c-5a0b35498f7e",
+			"name": "Like Functionality",
+			"url": "https://127.0.0.1:8000/posts/posts/32/like/",
+			"time": 410,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				410
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "419de904-cc63-4d9f-9cc1-4a75ed127fec",
+			"name": "Unlikes a specific post.",
+			"url": "https://127.0.0.1:8000/posts/posts/32/unlike/",
+			"time": 80,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				80
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "d307bdac-8108-4cf3-b100-32fd7bd34f9a",
+			"name": "User Login",
+			"url": "https://127.0.0.1:8000/posts/login/",
+			"time": 60,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				60
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "becf8be1-1f0a-463b-aa8f-50060e4d56ef",
+			"name": "Retrieve All Posts",
+			"url": "https://127.0.0.1:8000/posts/posts/",
+			"time": 24,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				24
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "448793c7-47f1-4217-8b54-a93724dc1d08",
+			"name": "Google Oauth",
+			"url": "https://127.0.0.1:8000/accounts/google/login/",
+			"time": 9,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				9
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "b2e2d9c7-d4ce-4911-82c8-b3c08add7a4b",
+			"name": "Retrieve Latest News Feed",
+			"url": "https://127.0.0.1:8000/posts/feed/",
+			"time": 19,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				19
+			],
+			"allTests": [
+				{}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 948,
+	"collection": {
+		"requests": [
+			{
+				"id": "7b0e6967-0a98-4109-9ce9-aa432edb5720",
+				"method": "POST"
+			},
+			{
+				"id": "b2e91b4f-33ac-4e4e-b5b8-a51492bf3c49",
+				"method": "GET"
+			},
+			{
+				"id": "d43b9fa6-6f66-440f-a30f-e0d6b03fb7ca",
+				"method": "GET"
+			},
+			{
+				"id": "e66092d9-e152-49e3-a0fd-3190bcfce04b",
+				"method": "POST"
+			},
+			{
+				"id": "940473ce-d6d7-46ac-aca0-5347c92ba5be",
+				"method": "GET"
+			},
+			{
+				"id": "6a096885-cf6b-4f55-99cf-5700ef08bb7c",
+				"method": "GET"
+			},
+			{
+				"id": "45f63417-cc7e-4698-80c1-3ecda0db274c",
+				"method": "GET"
+			},
+			{
+				"id": "1ec50043-e349-4669-83ed-0929c2ac5d39",
+				"method": "DELETE"
+			},
+			{
+				"id": "8a3293fe-49a7-4d2d-be62-ad1c69792f24",
+				"method": "PUT"
+			},
+			{
+				"id": "c0c63d8c-be7d-419d-bba1-689071cbd117",
+				"method": "GET"
+			},
+			{
+				"id": "02216774-8711-4f11-86be-379c5a2c5785",
+				"method": "GET"
+			},
+			{
+				"id": "a7df5bf2-cde3-449b-988b-dd6d1e6a4788",
+				"method": "DELETE"
+			},
+			{
+				"id": "043a2a76-1661-4724-b1e5-b1ccf68450e8",
+				"method": "POST"
+			},
+			{
+				"id": "f7d10d70-8068-427f-8219-b3007eb117dd",
+				"method": "GET"
+			},
+			{
+				"id": "825ea1ff-9bcc-4684-94f3-4da9dbdbbc28",
+				"method": "GET"
+			},
+			{
+				"id": "fea743c1-904c-4a92-b9d4-49030539432b",
+				"method": "GET"
+			},
+			{
+				"id": "ca698143-9728-4249-9a7a-43d3a9a38289",
+				"method": "DELETE"
+			},
+			{
+				"id": "ee12214e-f243-45ff-8db9-2489e8e49e63",
+				"method": "GET"
+			},
+			{
+				"id": "f049861c-eafe-4ae5-964c-5a0b35498f7e",
+				"method": "POST"
+			},
+			{
+				"id": "419de904-cc63-4d9f-9cc1-4a75ed127fec",
+				"method": "DELETE"
+			},
+			{
+				"id": "d307bdac-8108-4cf3-b100-32fd7bd34f9a",
+				"method": "POST"
+			},
+			{
+				"id": "becf8be1-1f0a-463b-aa8f-50060e4d56ef",
+				"method": "GET"
+			},
+			{
+				"id": "448793c7-47f1-4217-8b54-a93724dc1d08",
+				"method": "GET"
+			},
+			{
+				"id": "b2e2d9c7-d4ce-4911-82c8-b3c08add7a4b",
+				"method": "GET"
+			}
+		]
+	}
+}
