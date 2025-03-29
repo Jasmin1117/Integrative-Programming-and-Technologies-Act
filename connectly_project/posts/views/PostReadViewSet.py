@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
+from accounts.adapters import User
 from posts.models import Post, Comment
-from posts.serializers import PostSerializer, CommentSerializer
+from posts.serializers import PostSerializer, CommentSerializer, UserSerializer
 
 
 class PostReadViewSet(viewsets.ReadOnlyModelViewSet):
@@ -62,3 +63,25 @@ class PostReadViewSet(viewsets.ReadOnlyModelViewSet):
         comments = Comment.objects.filter(post=post)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
+
+    # posts/posts/{pk}/countlikes/
+    @action(detail=True, methods=['get'], url_path='countlikes')
+    def count_likes(self, request, pk=None):
+        """Retrieve the number of likes for a post."""
+        post = self.get_object()
+        return Response({'likes_count': post.likes.count()}, status=status.HTTP_200_OK)
+
+    # posts/posts/{pk}/likedby/
+    @action(detail=True, methods=['get'], url_path='likedby')
+    def liked_by(self, request, pk=None):
+        """Retrieve the list of users who liked a post."""
+        post = self.get_object()
+
+        if post.privacy != 'public':
+            return Response()
+
+        # Fetch users who liked the post (via the Like model)
+        liked_users = User.objects.filter(likes__post=post)
+
+        serializer = UserSerializer(liked_users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

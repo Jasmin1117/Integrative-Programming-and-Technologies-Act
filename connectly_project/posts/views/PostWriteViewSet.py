@@ -1,4 +1,6 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -7,7 +9,7 @@ import logging
 
 from factories.post_factory import PostFactory
 from posts.models import Post
-from posts.serializers import PostSerializer
+from posts.serializers import PostSerializer, CommentSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -58,3 +60,17 @@ class PostWriteViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_403_FORBIDDEN)
         post.delete()
         return Response({'message': 'Post deleted successfully.'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='comment', url_name='comment')
+    def create_comment(self, request, pk=None):
+        logger.info(f"Received request to create comment for post {pk}")
+        post = get_object_or_404(Post, id=pk)
+        serializer = CommentSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(user=request.user, post=post)
+            logger.info(f"User '{request.user.username}' added a comment to post {pk}.")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        logger.error(f"Comment creation failed for user '{request.user.username}': {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

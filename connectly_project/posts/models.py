@@ -1,6 +1,10 @@
 from django.db import models
 
 from connectly_project import settings
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
 
 class Post(models.Model):
@@ -38,7 +42,6 @@ class Comment(models.Model):
         return f"Comment by {self.user.username} on {self.post.id}"
 
 
-
 # Like Model
 class Like(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='likes')
@@ -50,3 +53,9 @@ class Like(models.Model):
 
     def __str__(self):
         return f'{self.user.username} liked {self.post.title}'
+
+
+@receiver(post_save, sender=User)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
