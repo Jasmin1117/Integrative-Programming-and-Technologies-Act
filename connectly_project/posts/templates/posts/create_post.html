@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Post - MMDC Connectly{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 class="text-2xl font-bold text-center mb-6">📝 Create a New Post</h2>
+
+        <!-- Display success or error messages -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="id_title" class="block text-gray-700">Title</label>
+                <input type="text" name="title" id="id_title" required
+                       class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+                {% if form.title.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.title.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_content" class="block text-gray-700">Content</label>
+                <textarea name="content" id="id_content" rows="4" required
+                          class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300"></textarea>
+                {% if form.content.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.content.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_post_type" class="block text-gray-700">Post Type</label>
+                <select name="post_type" id="id_post_type" required
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+                    <option value="text">Text</option>
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                </select>
+                {% if form.post_type.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.post_type.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+{##}
+{#            <div>#}
+{#                <label for="id_metadata" class="block text-gray-700">Metadata (JSON)</label>#}
+{#                <input type="text" name="metadata" id="id_metadata"#}
+{#                       class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">#}
+{#                {% if form.metadata.errors %}#}
+{#                    <div class="text-red-500 text-sm">#}
+{#                        {% for error in form.metadata.errors %}#}
+{#                            <p>{{ error }}</p>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                {% endif %}#}
+{#            </div>#}
+
+            <div>
+                <label for="id_privacy" class="block text-gray-700">Privacy</label>
+                <select name="privacy" id="id_privacy" required
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+                {% if form.privacy.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.privacy.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200">
+                Create Post
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

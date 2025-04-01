@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
+from django.views import View
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -10,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from posts.forms import PostForm
 from posts.models import Post, Like, Comment
 from posts.permissions import IsPostAuthor, IsPostAuthorOrAdmin, IsCommentAuthorOrAdmin
 from posts.serializers import UserSerializer, PostSerializer, CommentSerializer, LikeSerializer
@@ -137,7 +140,7 @@ class PostDetailView(APIView):
         """Updates a specific post (only author can update)."""
         try:
             post = get_object_or_404(Post, pk=pk)
-            if not IsPostAuthor().has_object_permission(request, self, post):  #changed here.
+            if not IsPostAuthor().has_object_permission(request, self, post):  # changed here.
                 return Response({'detail': 'You do not have permission to perform this action.'},
                                 status=status.HTTP_403_FORBIDDEN)
 
@@ -212,7 +215,6 @@ class CommentListCreate(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-
     def post(self, request, post_id):
         """Creates a comment on a specific post. """
         post = get_object_or_404(Post, id=post_id)
@@ -225,6 +227,7 @@ class CommentListCreate(APIView):
 
         logger.error(f"Comment creation failed for user '{request.user.username}': {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CommentDeleteView(DestroyAPIView):
     """Handles deleting comments."""
@@ -322,3 +325,76 @@ class UnlikePostView(APIView):
             return Response({"message": "Post unliked successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "You haven't liked this post yet."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PublicPostsView(View):
+    """Renders public posts in a UI template."""
+
+    def get(self, request):
+        public_posts = Post.objects.filter(privacy='public').order_by('-created_at')  # Fetch all public posts
+        return render(request, 'posts/public_posts.html', {'posts': public_posts})
+
+
+class LatestPostsFeed(ListAPIView):
+    """Fetches the latest posts and returns them as JSON."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [AllowAny]  # Anyone can view latest posts
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.filter(privacy='public').order_by('-created_at')[:10]  # Get latest 10 posts
+
+
+class LatestPostsView(View):
+    """Renders the latest posts in a UI template."""
+
+    def get(self, request):
+        latest_posts = Post.objects.filter(privacy='public').order_by('-created_at')[:10]
+        return render(request, 'posts/latest_posts.html', {'posts': latest_posts})
+
+class MyPostsView(View):
+    """Renders my posts in a UI template."""
+
+    def get(self, request):
+        # Get all posts created by the logged-in user
+        latest_posts = Post.objects.filter(created_by=request.user).order_by('-created_at')
+
+        # Paginate the posts to show 10 posts per page
+        paginator = Paginator(latest_posts, 10)  # Show 10 posts per page
+        page_number = request.GET.get('page')  # Get current page from the query string
+        page_obj = paginator.get_page(page_number)
+
+        # Pass the posts and pagination info to the template
+        return render(request, 'posts/my_posts.html', {'page_obj': page_obj})
+
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
+
+class CreatePostView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'  # Custom login URL (replace with your actual login URL)
+    redirect_field_name = 'next'  # Optional: Customize the query parameter for redirection
+
+    def get(self, request):
+        form = PostForm()  # Initialize an empty form
+        return render(request, 'posts/create_post.html', {'form': form})
+
+    def post(self, request):
+        form = PostForm(request.POST)  # Pass the posted data to the form
+        if form.is_valid():
+            post = form.save(commit=False)  # Do not save yet, as we need to add the user
+            post.created_by = request.user  # Access the logged-in user directly from request.user
+            post.save()  # Save the post with the user set
+
+            # Display a success message
+            messages.success(request, "Post created successfully!")
+            return redirect('public_posts')  # Redirect to a page that shows posts
+        else:
+            # Log the form errors for debugging
+            print(form.errors)
+
+            # If form is not valid, show an error message
+            messages.error(request, "There was an error creating your post. Please try again.")
+            return render(request, 'posts/create_post.html', {'form': form})  # If form is not valid, render again with errors

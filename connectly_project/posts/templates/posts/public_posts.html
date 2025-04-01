@@ -8,11 +8,9 @@
 
     <div class="space-y-8">
         {% for post in posts %}
-            <div class="bg-white rounded-lg shadow-md p-4">
+            <div class="bg-white rounded-lg shadow-md p-4" id="post-{{ post.id }}">
                 <!-- Post Header -->
                 <div class="flex items-center mb-4">
-                    <img src="{{ post.created_by.profile_picture.url }}" alt="User Avatar"
-                         class="w-10 h-10 rounded-full border border-gray-300">
                     <div class="ml-3">
                         <h3 class="font-semibold">{{ post.created_by.username }}</h3>
                         <p class="text-sm text-gray-500">{{ post.created_at|date:"F d, Y" }}</p>
@@ -30,10 +28,10 @@
                 <!-- Like and Comment Actions -->
                 <div class="flex items-center justify-between text-gray-600 text-sm">
                     <div class="flex items-center space-x-2">
-                        <form method="post" action="{% url 'like_post' post.id %}">
+                        <form method="post" action="{% url 'like_post' post.id %}" id="like-form-{{ post.id }}">
                             {% csrf_token %}
-                            <button type="submit" class="text-red-500 hover:text-red-700">
-                                ❤️ {{ post.likes.count }} Likes
+                            <button type="submit" class="text-red-500 hover:text-red-700" data-post-id="{{ post.id }}">
+                                ❤️ <span class="like-count">{{ post.likes.count }}</span> Likes
                             </button>
                         </form>
                         <p>💬 {{ post.comments.count }} Comments</p>
@@ -66,4 +64,42 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    // Add event listener to handle the "like" button click with AJAX
+    document.querySelectorAll('form[id^="like-form-"]').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const postId = form.querySelector('[data-post-id]').getAttribute('data-post-id');
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const authToken = localStorage.getItem('auth_token');  // Get the auth token (stored in localStorage)
+
+            fetch(`/posts/posts/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken, // CSRF token for form protection
+                    'Authorization': `Token ${authToken}`  // Include auth token for authentication
+                },
+                body: JSON.stringify({
+                    // Optionally send other data if needed
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);  // Show error if any
+                } else {
+                    // Update like count dynamically
+                    const likeCountElement = form.querySelector('.like-count');
+                    likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
+                    alert('Post liked!');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+
 {% endblock %}

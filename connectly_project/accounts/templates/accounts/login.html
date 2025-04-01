@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - MMDC Connectly{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 class="text-2xl font-bold text-center mb-6">🔑 Login to MMDC Connectly</h2>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="id_username" class="block text-gray-700">Username</label>
+                <input type="text" name="username" id="id_username" required
+                       class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+            </div>
+
+            <div>
+                <label for="id_password" class="block text-gray-700">Password</label>
+                <input type="password" name="password" id="id_password" required
+                       class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200">
+                Login
+            </button>
+        </form>
+
+        <div class="mt-4 text-center">
+            <p class="text-gray-600">Don't have an account?
+                <a href="{% url 'register' %}" class="text-blue-500 hover:underline">Register</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'posts',
+    'accounts',
     'django_extensions',
     'rest_framework.authtoken',
     'sslserver',
@@ -33,8 +34,27 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'accounts'
+
+    'tailwind',
+    'theme',
+    'django_browser_reload'
 ]
+
+TAILWIND_APP_NAME = 'theme'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+# You nee to download and install nodejs for tailwind
+# NodeJS: https://nodejs.org/en/
+# To find bin path using windows go to Power shell and run it as an administrator and
+# Execute this command inside power shell
+# Get-Command npm | Select-Object -ExpandProperty Source
+# Copy the result and paste it down here
+
+# [On my end it is C:\\Program Files\\nodejs\\npm.cmd]
+NPM_BIN_PATH = "C:\\Program Files\\nodejs\\npm.cmd"
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
@@ -44,7 +64,6 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
-
 
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.MySocialAccountAdapter'
 
@@ -58,7 +77,6 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
-
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -81,15 +99,22 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware' #https://stackoverflow.com/questions/77012106/django-allauth-modulenotfounderror-no-module-named-allauth-account-middlewar
+    'allauth.account.middleware.AccountMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
+    #https://stackoverflow.com/questions/77012106/django-allauth-modulenotfounderror-no-module-named-allauth-account-middlewar
 ]
 
 ROOT_URLCONF = 'connectly_project.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',
+            BASE_DIR / 'accounts/templates',
+            BASE_DIR / 'posts/templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,7 +124,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = 'connectly_project.wsgi.application'
@@ -164,3 +189,5 @@ REST_FRAMEWORK = {
 }
 
 
+DEFAULT_REDIRECT_URL = "https://127.0.0.1:8000/"
+LOGOUT_REDIRECT_URL = 'https://127.0.0.1:8000/api/auth/login/'

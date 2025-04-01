@@ -18,13 +18,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from posts.views.AuthViewSet import AuthViewSet
+from connectly_project.views import home
+from posts.urls import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),  # DRF login/logout,
-    path("api/auth/login/", AuthViewSet.as_view({"post": "login"}), name="login"),
-    path("api/auth/logout/", AuthViewSet.as_view({"post": "logout"}), name="logout"),
     path('posts/', include('posts.urls')),
-    path('', include('accounts.urls'))
+    path('accounts/', include('accounts.urls')),
+    path("__reload__/", include("django_browser_reload.urls")),
+    path('', include(router.urls)),
+    path('', home, name='home'),  # Set home URL
 ]

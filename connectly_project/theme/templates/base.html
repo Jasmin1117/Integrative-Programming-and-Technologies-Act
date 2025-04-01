@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Default description{% endblock %}">
+    <title>{% block title %}MMDC Connectly{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white h-full p-4 shadow-md fixed">
+        <h1 class="text-2xl font-bold mb-6">MMDC Connectly</h1>
+
+        <nav>
+            <ul class="space-y-4">
+                {% if request.user.is_authenticated %}
+                    {% if request.user.is_superuser %}
+                        <!-- Admin Navigation -->
+                        <li><a href="{% url 'admin_dashboard' %}"
+                               class="block p-2 text-gray-700 hover:bg-gray-200 rounded">📊 Admin Dashboard</a></li>
+                        <li><a href="{% url 'manage_users' %}"
+                               class="block p-2 text-gray-700 hover:bg-gray-200 rounded">👥 Manage Users</a></li>
+                    {% else %}
+                        <!-- Regular User Navigation -->
+                        <li><a href="{% url 'public_posts' %}"
+                               class="block p-2 text-gray-700 hover:bg-gray-200 rounded">📝 Public Posts</a></li>
+
+                        <li><a href="{% url 'latest_posts' %}"
+                               class="block p-2 text-gray-700 hover:bg-gray-200 rounded">📰 Latest Posts</a></li>
+                        <li><a href="{% url 'create_post' %}"
+                               class="block p-2 text-gray-700 hover:bg-gray-200 rounded">➕ Create Post</a></li>
+                        <li><a href="{% url 'my_posts' %}"
+                               class="block p-2 text-gray-700 hover:bg-gray-200 rounded">👁️ My Posts</a></li>
+                        <!-- Link to the latest posts -->
+                        {#                        <li><a href="{% url 'create_post' %}" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">➕ Create</a></li>#}
+                        {#                        <li><a href="{% url 'notifications' %}" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">❤️ Notifications</a></li>#}
+                        {#                        <li><a href="{% url 'profile' user.username %}" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">👤 Profile</a></li>#}
+                    {% endif %}
+
+                    <!-- Logout -->
+                    <li>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="block p-2 text-red-500 hover:bg-red-100 rounded">🚪 Logout
+                            </button>
+                        </form>
+                    </li>
+
+                {% else %}
+                    <!-- Non-authenticated User -->
+                    <li><a href="{% url 'login' %}" class="block p-2 text-blue-500 hover:bg-blue-100 rounded">🔑
+                        Login</a></li>
+                    <li><a href="{% url 'register' %}" class="block p-2 text-green-500 hover:bg-green-100 rounded">📝
+                        Register</a></li>
+                    {#                    <li><a href="{% url 'public_posts' %}" class="block p-2 text-gray-700 hover:bg-gray-200 rounded">📝 Public Posts</a></li>#}
+                {% endif %}
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 p-6">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Right Sidebar (Hidden) -->
+    <!-- No need to display Suggested for You -->
+    <aside class="hidden"></aside>
+</div>
+</body>
+</html>

@@ -13,7 +13,6 @@ class IsPostAuthor(BasePermission):
             return obj.created_by == request.user
 
         # For any other privacy setting, add additional logic
-        # For example, you might want to handle 'friends-only' posts
         # This prevents any unintended access
         return False
 

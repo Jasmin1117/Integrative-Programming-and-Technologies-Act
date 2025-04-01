@@ -1,4 +1,5 @@
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -8,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 import logging
 
 from factories.post_factory import PostFactory
+from posts.forms import PostForm
 from posts.models import Post
 from posts.serializers import PostSerializer, CommentSerializer
 
@@ -20,6 +22,9 @@ class PostWriteViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+
+
 
     def create(self, request, *args, **kwargs):
         """Creates a new post."""

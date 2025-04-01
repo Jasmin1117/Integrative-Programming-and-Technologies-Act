@@ -1,0 +1,14 @@
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.idea/
+.env
+
+requirements.txt
+Procfile
+runner.txt
