@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Post - MMDC Connectly{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 class="text-2xl font-bold text-center mb-6">✏️ Edit Post</h2>
+
+        <!-- Display success or error messages -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="id_title" class="block text-gray-700">Title</label>
+                <input type="text" name="title" id="id_title" value="{{ form.title.value }}" required
+                       class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+                {% if form.title.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.title.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_content" class="block text-gray-700">Content</label>
+                <textarea name="content" id="id_content" rows="4" required
+                          class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">{{ form.content.value }}</textarea>
+                {% if form.content.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.content.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_post_type" class="block text-gray-700">Post Type</label>
+                <select name="post_type" id="id_post_type" required
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+                    <option value="text" {% if form.post_type.value == 'text' %}selected{% endif %}>Text</option>
+                    <option value="image" {% if form.post_type.value == 'image' %}selected{% endif %}>Image</option>
+                    <option value="video" {% if form.post_type.value == 'video' %}selected{% endif %}>Video</option>
+                </select>
+                {% if form.post_type.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.post_type.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_privacy" class="block text-gray-700">Privacy</label>
+                <select name="privacy" id="id_privacy" required
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300">
+                    <option value="public" {% if form.privacy.value == 'public' %}selected{% endif %}>Public</option>
+                    <option value="private" {% if form.privacy.value == 'private' %}selected{% endif %}>Private</option>
+                </select>
+                {% if form.privacy.errors %}
+                    <div class="text-red-500 text-sm">
+                        {% for error in form.privacy.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200">
+                Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

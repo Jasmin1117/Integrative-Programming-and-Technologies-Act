@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from factories.post_factory import PostFactory
 from posts.forms import PostForm
 from posts.models import Post, Like, Comment
 from posts.permissions import IsPostAuthor, IsPostAuthorOrAdmin, IsCommentAuthorOrAdmin
@@ -293,22 +294,25 @@ class PostCommentsView(ListAPIView):
 
 
 class LikePostView(APIView):
-    """Handles liking a post."""
+    """Handles liking and unliking a post."""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, post_id):
-        """Likes a specific post."""
+        """Toggles like status for a specific post."""
         post = get_object_or_404(Post, id=post_id)
+        like = Like.objects.filter(user=request.user, post=post).first()
 
-        if Like.objects.filter(user=request.user, post=post).exists():
-            logger.info(f"User {request.user.username} tried to like post {post_id} again.")
-            return Response({"error": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+        if like:
+            like.delete()
+            message = "Post unliked successfully."
+        else:
+            Like.objects.create(user=request.user, post=post)
+            message = "Post liked successfully."
 
-        like = Like.objects.create(user=request.user, post=post)
-        logger.info(f"User {request.user.username} liked post {post_id}.")
+        # Get the latest like count
+        like_count = post.likes.count()
 
-        serializer = LikeSerializer(like)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"message": message, "like_count": like_count}, status=status.HTTP_200_OK)
 
 
 class UnlikePostView(APIView):
@@ -370,31 +374,82 @@ class MyPostsView(View):
 
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from posts.forms import PostForm
 
 class CreatePostView(LoginRequiredMixin, View):
-    login_url = '/accounts/login/'  # Custom login URL (replace with your actual login URL)
-    redirect_field_name = 'next'  # Optional: Customize the query parameter for redirection
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
 
     def get(self, request):
-        form = PostForm()  # Initialize an empty form
+        form = PostForm()
         return render(request, 'posts/create_post.html', {'form': form})
 
     def post(self, request):
-        form = PostForm(request.POST)  # Pass the posted data to the form
+        form = PostForm(request.POST)
         if form.is_valid():
-            post = form.save(commit=False)  # Do not save yet, as we need to add the user
-            post.created_by = request.user  # Access the logged-in user directly from request.user
-            post.save()  # Save the post with the user set
+            # Extract form data
+            title = form.cleaned_data['title']
+            content = form.cleaned_data['content']
+            post_type = form.cleaned_data['post_type']
+            privacy = form.cleaned_data['privacy']
 
-            # Display a success message
-            messages.success(request, "Post created successfully!")
-            return redirect('public_posts')  # Redirect to a page that shows posts
+            # Create the post using PostFactory
+            try:
+                post = PostFactory.create_post(
+                    post_type=post_type,
+                    title=title,
+                    content=content,
+                    created_by=request.user,
+                    privacy=privacy
+                )
+                messages.success(request, "Post created successfully!")
+                return redirect('public_posts')
+            except ValueError as e:
+                messages.error(request, f"Error: {e}")
+
+        # If form is not valid, render again with errors
+        return render(request, 'posts/create_post.html', {'form': form})
+
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.views import View
+
+class EditPostView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
+
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id, created_by=request.user)
+        form = PostForm(instance=post)
+        return render(request, 'posts/edit_post.html', {'form': form, 'post': post})
+
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id, created_by=request.user)
+        form = PostForm(request.POST, instance=post)
+
+        if form.is_valid():
+            # Update the post using the form data
+            title = form.cleaned_data['title']
+            content = form.cleaned_data['content']
+            post_type = form.cleaned_data['post_type']
+            privacy = form.cleaned_data['privacy']
+
+            try:
+                # Save the updated post
+                post.title = title
+                post.content = content
+                post.post_type = post_type
+                post.privacy = privacy
+                post.save()
+
+                messages.success(request, "Post updated successfully!")
+                return redirect('public_posts')
+            except ValueError as e:
+                messages.error(request, f"Error: {e}")
         else:
-            # Log the form errors for debugging
-            print(form.errors)
+            messages.error(request, "There was an error with the form. Please try again.")
 
-            # If form is not valid, show an error message
-            messages.error(request, "There was an error creating your post. Please try again.")
-            return render(request, 'posts/create_post.html', {'form': form})  # If form is not valid, render again with errors
+        return render(request, 'posts/edit_post.html', {'form': form, 'post': post})

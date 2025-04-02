@@ -34,4 +34,28 @@
         </div>
     </div>
 </div>
+{#    #}
+{#<script>#}
+{#document.querySelector("form").addEventListener("submit", async function(event) {#}
+{#    event.preventDefault();#}
+{#    #}
+{#    const formData = new FormData(this);#}
+{#    #}
+{#    const response = await fetch("{% url 'login' %}", {#}
+{#        method: "POST",#}
+{#        body: formData#}
+{#    });#}
+{#    #}
+{#    const data = await response.json();#}
+{#    #}
+{#    if (response.ok) {#}
+{#        localStorage.setItem("auth_token", data.token);  // Save token in localStorage#}
+{#        alert("Login successful!");#}
+{#        window.location.href = "{% url 'latest_posts' %}";  // Redirect after login#}
+{#    } else {#}
+{#        alert(data.error);#}
+{#    }#}
+{#});#}
+{#</script>#}
+
 {% endblock %}

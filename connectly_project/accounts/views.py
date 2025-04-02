@@ -91,11 +91,29 @@ def login_view(request):
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 
-class CustomLoginView(auth_views.LoginView):
-    template_name = 'accounts/login.html'  # Path relative to templates directory
+
+
+
+# class CustomLoginView(auth_views.LoginView):
+#     template_name = 'accounts/login.html'  # Path relative to templates directory
+#
+#     def get_success_url(self):
+#         if self.request.user.is_superuser:
+#             return reverse_lazy('admin_dashboard')  # Redirect to admin dashboard
+#         else: # Route for the regular user, they can see latest posts(if authenticated)
+#             return reverse_lazy('latest_posts')  # Redirect to the posts feed
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.contrib.auth.views import LoginView
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CustomLoginView(LoginView):
+    template_name = 'accounts/login.html'
 
     def get_success_url(self):
         if self.request.user.is_superuser:
-            return reverse_lazy('admin_dashboard')  # Redirect to admin dashboard
-        else: # Route for the regular user, they can see latest posts(if authenticated)
-            return reverse_lazy('latest_posts')  # Redirect to the posts feed
+            return reverse_lazy('admin_dashboard')
+        return reverse_lazy('latest_posts')
