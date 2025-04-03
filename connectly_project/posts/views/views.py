@@ -453,3 +453,14 @@ class EditPostView(LoginRequiredMixin, View):
             messages.error(request, "There was an error with the form. Please try again.")
 
         return render(request, 'posts/edit_post.html', {'form': form, 'post': post})
+
+
+class DeletePostView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
+
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id, created_by=request.user)
+        post.delete()
+        messages.success(request, "Post deleted successfully!")
+        return redirect('my_posts')

@@ -13,7 +13,7 @@
 7 verbose unsafe-perm in lifecycle true
 8 info theme@3.8.0 Failed to exec dev script
 9 verbose stack Error: theme@3.8.0 dev: `cross-env NODE_ENV=development tailwindcss --postcss -i ./src/styles.css -o ../static/css/dist/styles.css -w`
-9 verbose stack Exit status 1
+9 verbose stack Exit status 134
 9 verbose stack     at EventEmitter.<anonymous> (D:\Integrative-Programming-and-Technologies-Act\connectly_project\node_modules\npm\lib\utils\lifecycle.js:217:16)
 9 verbose stack     at EventEmitter.emit (node:events:518:28)
 9 verbose stack     at ChildProcess.<anonymous> (D:\Integrative-Programming-and-Technologies-Act\connectly_project\node_modules\npm\lib\utils\spawn.js:24:14)
@@ -28,7 +28,7 @@
 15 error npm  v2.15.12
 16 error code ELIFECYCLE
 17 error theme@3.8.0 dev: `cross-env NODE_ENV=development tailwindcss --postcss -i ./src/styles.css -o ../static/css/dist/styles.css -w`
-17 error Exit status 1
+17 error Exit status 134
 18 error Failed at the theme@3.8.0 dev script 'cross-env NODE_ENV=development tailwindcss --postcss -i ./src/styles.css -o ../static/css/dist/styles.css -w'.
 18 error This is most likely a problem with the theme package,
 18 error not with npm itself.

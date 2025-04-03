@@ -16,7 +16,7 @@ from posts.serializers import PostSerializer, CommentSerializer
 logger = logging.getLogger(__name__)
 
 
-class PostWriteViewSet(viewsets.ModelViewSet):
+class PostAdminViewSet(viewsets.ModelViewSet):
     """Handles creating, updating, and deleting posts."""
     queryset = Post.objects.all()
     serializer_class = PostSerializer

@@ -1,3 +1,5 @@
+from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,7 +11,7 @@ from posts.models import Post, Comment
 from posts.serializers import PostSerializer, CommentSerializer, UserSerializer
 
 
-class PostReadViewSet(viewsets.ReadOnlyModelViewSet):
+class PostRegularUserViewSet(viewsets.ReadOnlyModelViewSet):
     """Handles listing and retrieving posts with privacy checks."""
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -63,6 +65,37 @@ class PostReadViewSet(viewsets.ReadOnlyModelViewSet):
         comments = Comment.objects.filter(post=post)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='comments', name="get-post-comments", permission_classes=[IsAuthenticated])
+    def get_post_comments(self, request, post_pk):
+        """View to display all comments for a specific post."""
+        post = get_object_or_404(Post, pk=post_pk)
+
+        # Check if the post is public or belongs to the current user
+        if post.privacy != 'public' and post.created_by != request.user:
+            return HttpResponseForbidden("You don't have permission to view this post's comments.")
+
+        comments = Comment.objects.filter(post=post).order_by('-created_at')
+
+        context = {
+            'post': post,
+            'comments': comments,
+        }
+
+        return render(request, 'posts/post_comments.html', context)
+
+    @action(detail=True, methods=['post'], url_path='comments', name="posts-regular-user-comments",
+            permission_classes=[IsAuthenticated])
+    def create_comment(self, request, pk=None):
+        """Creates a comment on a specific post."""
+        post = get_object_or_404(Post, id=pk)
+        serializer = CommentSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(user=request.user, post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # posts/posts/{pk}/countlikes/
     @action(detail=True, methods=['get'], url_path='countlikes')

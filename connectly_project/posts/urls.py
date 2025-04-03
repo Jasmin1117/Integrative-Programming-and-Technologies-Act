@@ -2,16 +2,15 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from posts.views.AuthViewSet import AuthViewSet
-from posts.views.PostReadViewSet import PostReadViewSet
-from posts.views.PostWriteViewSet import PostWriteViewSet
+from posts.views.PostRegularUserViewSet import PostRegularUserViewSet
+from posts.views.PostAdminViewSet import PostAdminViewSet
 from posts.views.views import ProtectedView, UserListCreate, UserLogin, PostDetailView, CommentListCreate, \
     UserPostsView, PostCommentsView, CommentDeleteView, OtherUserPostsView, LikePostView, UnlikePostView, NewsFeedView, \
-    LatestPostsFeed, LatestPostsView, PublicPostsView, CreatePostView, MyPostsView, EditPostView
+    LatestPostsFeed, LatestPostsView, PublicPostsView, CreatePostView, MyPostsView, EditPostView, DeletePostView
 
 router = DefaultRouter()
-router.register(r'posts', PostReadViewSet, basename='posts-read')
-router.register(r'manage', PostWriteViewSet, basename='posts-write')
-
+router.register(r'posts', PostRegularUserViewSet, basename='posts-regular-user')
+router.register(r'manage', PostAdminViewSet, basename='posts-admin-user')
 
 
 urlpatterns = [
@@ -19,12 +18,13 @@ urlpatterns = [
     path('', include(router.urls)),
     path('create/', CreatePostView.as_view(), name='create_post'),
     path('edit/<int:post_id>/', EditPostView.as_view(), name='edit_post'),
+    path('delete/<int:post_id>/', DeletePostView.as_view(), name='delete_post'),
     path('my-posts/', MyPostsView.as_view(), name='my_posts'),
     path('protected/', ProtectedView.as_view(), name='protected'),
     path('users/', UserListCreate.as_view(), name='user-list-create'),
     path('login/', UserLogin.as_view(), name='user-login'),
     path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
-    path('posts/<int:post_id>/comments/', CommentListCreate.as_view(), name='comment-list-create'),
+    # path('posts/<int:post_id>/comments/', CommentListCreate.as_view(), name='comment-list-create'),
     path('user/posts/', UserPostsView.as_view(), name='user-posts'),
     # path('post/<int:post_id>/comments/', PostCommentsView.as_view(), name='post-comments'),
     path('posts/<int:post_id>/comments/<int:comment_id>/delete/', CommentDeleteView.as_view(), name='comment-delete'),

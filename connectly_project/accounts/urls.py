@@ -14,5 +14,4 @@ urlpatterns = [
     path('register/', accounts.views.register_view, name='register'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('/', include('allauth.urls')),  # Allauth handles login/logout
-    # path('notifications/', accounts.views.notifications, name='notifications'),
 ]
