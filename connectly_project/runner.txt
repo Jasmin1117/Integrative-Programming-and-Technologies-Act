@@ -1,1 +1,7 @@
-python manage.py runserver_plus --cert-file cert.pem --key-file key.pem
+python manage.py runserver_plus --cert-file cert.pem --key-file key.pem & python manage.py tailwind start
+
+Updated Configuration
+https://drive.google.com/drive/folders/1__cpZbiXVcNBTtU5Qw1w1z5ARcgl_ZRs?usp=drive_link
+
+Use this command to launch the Django server with Tailwind.
+honcho start

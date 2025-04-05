@@ -19,13 +19,11 @@ from django.contrib import admin
 from django.urls import path, include
 
 from connectly_project.views import home
-from posts.urls import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('posts/', include('posts.urls')),
     path('accounts/', include('accounts.urls')),
     path("__reload__/", include("django_browser_reload.urls")),
-    path('', include(router.urls)),
     path('', home, name='home'),  # Set home URL
 ]

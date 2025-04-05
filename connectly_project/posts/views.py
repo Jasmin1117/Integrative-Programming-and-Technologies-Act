@@ -1,22 +1,17 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
-from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404
 from django.views import View
-from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import ListAPIView, DestroyAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from factories.post_factory import PostFactory
-from posts.forms import PostForm
-from posts.models import Post, Like, Comment
+from posts.models import Like
 from posts.permissions import IsPostAuthor, IsPostAuthorOrAdmin, IsCommentAuthorOrAdmin
-from posts.serializers import UserSerializer, PostSerializer, CommentSerializer, LikeSerializer
+from posts.serializers import PostSerializer, CommentSerializer
 from singletons.logger_singleton import LoggerSingleton
 
 # Get the user model
@@ -356,6 +351,7 @@ class LatestPostsView(View):
         latest_posts = Post.objects.filter(privacy='public').order_by('-created_at')[:10]
         return render(request, 'posts/latest_posts.html', {'posts': latest_posts})
 
+
 class MyPostsView(View):
     """Renders my posts in a UI template."""
 
@@ -372,11 +368,10 @@ class MyPostsView(View):
         return render(request, 'posts/my_posts.html', {'page_obj': page_obj})
 
 
-from django.contrib import messages
-from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from posts.forms import PostForm
+
 
 class CreatePostView(LoginRequiredMixin, View):
     login_url = '/accounts/login/'
@@ -412,10 +407,11 @@ class CreatePostView(LoginRequiredMixin, View):
         # If form is not valid, render again with errors
         return render(request, 'posts/create_post.html', {'form': form})
 
-from django.shortcuts import get_object_or_404
+
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views import View
+
 
 class EditPostView(LoginRequiredMixin, View):
     login_url = '/accounts/login/'
@@ -464,3 +460,203 @@ class DeletePostView(LoginRequiredMixin, View):
         post.delete()
         messages.success(request, "Post deleted successfully!")
         return redirect('my_posts')
+
+
+from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
+
+from accounts.adapters import User
+from posts.serializers import PostSerializer, UserSerializer
+
+
+class PostRegularUser(APIView):
+    """Handles listing and retrieving posts with privacy checks."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None):
+        if pk:
+            post = get_object_or_404(Post, pk=pk)
+            if post.privacy == 'private' and post.created_by != request.user:
+                return Response({'detail': 'You do not have permission to view this post.'},
+                                status=status.HTTP_403_FORBIDDEN)
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+        else:
+            posts = Post.objects.filter(privacy='public')
+            serializer = PostSerializer(posts, many=True)
+            return Response(serializer.data)
+
+
+class PublicPosts(APIView):
+    """List all public posts (no authentication required)."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        posts = Post.objects.filter(privacy='public')
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+
+class PrivatePosts(APIView):
+    """List only the authenticated user's private posts."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        posts = Post.objects.filter(privacy='private', created_by=request.user)
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+
+class PostComments(APIView):
+    """Retrieve all comments of a public post."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, post_pk):
+        post = get_object_or_404(Post, pk=post_pk)
+        if post.privacy != 'public' and post.created_by != request.user:
+            return HttpResponseForbidden("You don't have permission to view this post's comments.")
+        comments = Comment.objects.filter(post=post).order_by('-created_at')
+        return render(request, 'posts/post_comments.html', {'post': post, 'comments': comments})
+
+
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseForbidden
+from .models import Post, Comment
+from .serializers import CommentSerializer
+
+# class PostCommentsDetails(APIView):
+#     authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     permission_classes = [IsAuthenticated]
+#
+#     def get(self, request, post_pk):
+#         post = get_object_or_404(Post, pk=post_pk)
+#
+#         # Check if the post is private or the user isn't the author
+#         if post.privacy != 'public' and post.created_by != request.user:
+#             return HttpResponseForbidden("You don't have permission to view this post's comments.")
+#
+#         comments = Comment.objects.filter(post=post).order_by('-created_at')
+#
+#         # Pagination
+#         paginator = PageNumberPagination()
+#         paginator.page_size = 5  # Adjust the number of comments per page
+#         page_obj = paginator.paginate_queryset(comments, request)
+#
+#         # Serialize the paginated comments
+#         serialized_comments = CommentSerializer(page_obj, many=True)
+#
+#         return Response({
+#             'comments': serialized_comments.data,
+#             'next': paginator.get_next_link(),
+#             'previous': paginator.get_previous_link(),
+#         })
+
+from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404, render
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+
+from django.views import View
+from rest_framework.renderers import JSONRenderer
+from django.http import JsonResponse
+from django.shortcuts import render
+
+
+class PostCommentsDetails(View):
+    def get(self, request, post_pk):
+        post = get_object_or_404(Post, pk=post_pk)
+
+        # Check if the post is private or the user isn't the author
+        if post.privacy != 'public' and post.created_by != request.user:
+            return HttpResponseForbidden("You don't have permission to view this post's comments.")
+
+        comments = Comment.objects.filter(post=post).order_by('-created_at')
+
+        # Check if this is an API request
+        if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
+            # API response (JSON)
+            paginator = PageNumberPagination()
+            paginator.page_size = 5
+            page_obj = paginator.paginate_queryset(comments, request)
+            serialized_comments = CommentSerializer(page_obj, many=True)
+
+            return JsonResponse({
+                'comments': serialized_comments.data,
+                'next': paginator.get_next_link(),
+                'previous': paginator.get_previous_link(),
+            })
+        else:
+            # HTML response (template)
+            page = request.GET.get('page', 1)
+            paginator = Paginator(comments, 5)
+
+            try:
+                comments_page = paginator.page(page)
+            except PageNotAnInteger:
+                comments_page = paginator.page(1)
+            except EmptyPage:
+                comments_page = paginator.page(paginator.num_pages)
+
+            context = {
+                'post': post,
+                'comments': comments_page,
+                'is_paginated': comments_page.has_other_pages(),
+                'page_obj': comments_page,
+            }
+
+            return render(request, 'posts/post_comments.html', context)
+
+
+class CreateComment(APIView):
+    """Creates a comment on a specific post."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id=pk)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CountLikes(APIView):
+    """Retrieve the number of likes for a post."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        return Response({'likes_count': post.likes.count()}, status=status.HTTP_200_OK)
+
+
+class LikedBy(APIView):
+    """Retrieve the list of users who liked a post."""
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        if post.privacy != 'public':
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        liked_users = User.objects.filter(likes__post=post)
+        serializer = UserSerializer(liked_users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

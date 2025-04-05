@@ -26,6 +26,7 @@ def manage_users(request):
 
 
 @login_required()
+@user_passes_test(is_admin)
 def accounts_home(request):
     return render(request, 'home.html')
 
@@ -91,9 +92,6 @@ def login_view(request):
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 
-
-
-
 # class CustomLoginView(auth_views.LoginView):
 #     template_name = 'accounts/login.html'  # Path relative to templates directory
 #
@@ -109,9 +107,23 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
 
 
+from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+
 @method_decorator(csrf_exempt, name='dispatch')
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
+
+    def form_valid(self, form):
+        """Called when valid form credentials are submitted"""
+        messages.success(self.request, f"Welcome back, {self.request.user.username}!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """Called when login fails"""
+        messages.error(self.request, "Invalid username or password.")
+        return super().form_invalid(form)
 
     def get_success_url(self):
         if self.request.user.is_superuser:

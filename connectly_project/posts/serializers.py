@@ -60,18 +60,15 @@ class PostSerializer(serializers.ModelSerializer):
 
 # Comment Serializer
 class CommentSerializer(serializers.ModelSerializer):
-    comment = serializers.CharField(source="text")  # Rename text to comment
-    author_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
+    comment = serializers.CharField(source="text")  # Map 'text' to 'comment' in the model
     author_username = serializers.CharField(source="user.username", read_only=True)
-    post_id = serializers.PrimaryKeyRelatedField(source="post.id", read_only=True)
+    post_id = serializers.PrimaryKeyRelatedField(source="post.id", read_only=True)  # Optional: Show post ID
 
     class Meta:
         model = Comment
-        fields = ['id', 'comment', 'post_id', 'author_id', 'author_username', 'created_at']
-        read_only_fields = ['created_at']
-    
-    def validate_comment(self, value):  # Update validation method
-        """Ensure comment is not empty"""
+        fields = ['id', 'comment', 'author_username', 'post_id', 'created_at']  # Include the 'comment' field
+
+    def validate_comment(self, value):
         if not value.strip():
             raise serializers.ValidationError("Comment cannot be empty.")
         return value
