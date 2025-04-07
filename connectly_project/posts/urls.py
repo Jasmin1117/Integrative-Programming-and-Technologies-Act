@@ -11,11 +11,12 @@ from .views import (
     OtherUserPostsView,
     LikePostView,
     UnlikePostView,
-    NewsFeedView, CommentDeleteView,
+    NewsFeedView, CommentDeleteView, HelloWorldView,
 
 )
 
 urlpatterns = [
+    path('helloworld/', HelloWorldView.as_view(), name='hello-world'), # Sample cache
     path('protected/', ProtectedView.as_view(), name='protected'),
     path('users/', UserListCreate.as_view(), name='user-list-create'),
     path('login/', UserLogin.as_view(), name='user-login'),
@@ -30,7 +31,6 @@ urlpatterns = [
     path('posts/<int:post_id>/like/', LikePostView.as_view(), name='like_post'),
     path('posts/<int:post_id>/unlike/', UnlikePostView.as_view(), name='unlike-post'),
     path('feed/', NewsFeedView.as_view(), name='news-feed'),
-    
 ]
 
 
