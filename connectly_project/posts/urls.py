@@ -14,7 +14,10 @@ from .views import (
     NewsFeedView, CommentDeleteView, HelloWorldView,
 
 )
-
+# TODO Live Testing Evidence 04/27/2025
+# Based in the TA camu, we're required to test the new features implemented such as
+# 1. Privacy Settings and Role-Based Access Control (RBAC)✅
+# 2. Performance Optimization (Basic Caching)
 urlpatterns = [
     path('helloworld/', HelloWorldView.as_view(), name='hello-world'), # Sample cache
     path('protected/', ProtectedView.as_view(), name='protected'),

@@ -223,17 +223,7 @@ class NewsFeedView(ListAPIView):
 
     def get_queryset(self):
         """Retrieves posts for the news feed. (Public and private posts by the author)."""
-        page = self.request.GET.get('page', 1)  # Default to page 1 if no page is provided
-        cache_key = f"feed:{self.request.path}?page={page}"
-
-        # Check if the cache exists for this key
-        cached_response = cache.get(cache_key)
-        if cached_response:
-            logger.info(f"Cache hit for {cache_key}.")
-            return cached_response
-
-        logger.info(f"Cache miss for {cache_key}. Fetching fresh data.")
-
+        # Don't cache the queryset itself, just build it properly
         try:
             if self.request.user.role == 'guest':
                 queryset = Post.objects.filter(privacy='public')
@@ -255,24 +245,32 @@ class NewsFeedView(ListAPIView):
         # Sorting and prefetching comments
         queryset = queryset.order_by('-created_at').prefetch_related('comments')
 
-        # Serialize data and cache the result (serialized response)
-        serialized_data = PostSerializer(queryset, many=True).data
+        return queryset
 
-        # Cache the serialized data
-        cache.set(cache_key, serialized_data, timeout=60)  # Cache for 60 seconds
+    def list(self, request, *args, **kwargs):
+        """Override list method to implement caching of the paginated, serialized response."""
+        page = self.request.GET.get('page', 1)  # Default to page 1 if no page is provided
+        liked_only = self.request.query_params.get('liked_only', 'false')
+
+        # Create a cache key including relevant parameters
+        cache_key = f"feed:{request.user.id}:{page}:liked_only={liked_only}"
+
+        # Check if the cache exists for this key
+        cached_response = cache.get(cache_key)
+        if cached_response:
+            logger.info(f"Cache hit for {cache_key}.")
+            return Response(cached_response)
+
+        logger.info(f"Cache miss for {cache_key}. Fetching fresh data.")
+
+        # Get the standard response from ListAPIView (which handles pagination)
+        response = super().list(request, *args, **kwargs)
+
+        # Cache the serialized and paginated response data
+        cache.set(cache_key, response.data, timeout=60)  # Cache for 60 seconds
         logger.info(f"Cache set for {cache_key} with timeout of 60 seconds.")
 
-        return serialized_data
-
-    def get(self, request, *args, **kwargs):
-        """Override to return response and ensure cache is used."""
-        try:
-            queryset = self.get_queryset()
-            logger.info(f"User '{self.request.user.username}' fetched feed data.")
-            return Response(queryset)
-        except Exception as e:
-            logger.error(f"Error fetching feed: {str(e)}")
-            return Response({"error": "An error occurred while fetching the feed."}, status=500)
+        return response
 
 
 # --- Comment Management ---
@@ -430,9 +428,9 @@ class HelloWorldView(View):
         # Check if the cached response exists
         cached_response = cache.get(cache_key)
         if cached_response:
+            logger.info(f"Cache hit inner: {cache_key}")
             return JsonResponse({'message': 'Hello, World! (from cache)'})
-
         # If no cached response, set a new one
         cache.set(cache_key, 'Hello, World!', timeout=60)
-
+        logger.info(f"Cache hit outer: {cache_key}")
         return JsonResponse({'message': 'Hello, World! (first time)'})
