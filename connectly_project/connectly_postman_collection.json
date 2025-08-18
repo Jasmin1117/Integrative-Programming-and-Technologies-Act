@@ -1,0 +1,1149 @@
+{
+	"info": {
+		"_postman_id": "connectly-project-api-collection",
+		"name": "Connectly Project API Collection",
+		"description": "Complete API collection for the Connectly Django project covering authentication, user management, posts, comments, likes, and admin operations.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "connectly-project"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "User Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\",\n    \"email\": \"test@example.com\",\n    \"role\": \"User\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"users",
+								""
+							]
+						},
+						"description": "Register a new user account. Role can be 'User' or 'Admin'."
+					},
+					"response": []
+				},
+				{
+					"name": "User Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "testuser",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "testpass123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api-token-auth/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-token-auth",
+								""
+							]
+						},
+						"description": "Authenticate user and receive authentication token using Django REST Framework's built-in endpoint."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Authentication",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/protected/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"protected",
+								""
+							]
+						},
+						"description": "Verify that the authentication token is valid."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration, login, and token verification."
+		},
+		{
+			"name": "👥 User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"users",
+								""
+							]
+						},
+						"description": "Retrieve list of all registered users (requires authentication)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/accounts/api/users/{{user_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"users",
+								"{{user_id}}",
+								""
+							]
+						},
+						"description": "Get specific user details by user ID (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"updatedusername\",\n    \"email\": \"updated@example.com\",\n    \"role\": \"User\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/accounts/api/users/{{user_id}}/update/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"users",
+								"{{user_id}}",
+								"update",
+								""
+							]
+						},
+						"description": "Update user information (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/accounts/api/users/{{user_id}}/deactivate/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"users",
+								"{{user_id}}",
+								"deactivate",
+								""
+							]
+						},
+						"description": "Deactivate a user account (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Activate User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/accounts/api/users/{{user_id}}/activate/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"users",
+								"{{user_id}}",
+								"activate",
+								""
+							]
+						},
+						"description": "Activate a deactivated user account (admin only)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/accounts/api/users/{{user_id}}/delete/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"users",
+								"{{user_id}}",
+								"delete",
+								""
+							]
+						},
+						"description": "Permanently delete a user account (admin only)."
+					},
+					"response": []
+				}
+			],
+			"description": "User management endpoints for CRUD operations on user accounts."
+		},
+		{
+			"name": "📝 Posts",
+			"item": [
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"My First Post\",\n    \"content\": \"This is the content of my first post.\",\n    \"post_type\": \"text\",\n    \"metadata\": {}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/posts/create/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"create",
+								""
+							]
+						},
+						"description": "Create a new post. Post types: 'text', 'image', 'video'."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								""
+							]
+						},
+						"description": "Retrieve all posts (requires authentication)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								""
+							]
+						},
+						"description": "Get specific post details by post ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/my-posts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"my-posts",
+								""
+							]
+						},
+						"description": "Get posts created by the authenticated user."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Posts by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/users/{{user_id}}/posts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"users",
+								"{{user_id}}",
+								"posts",
+								""
+							]
+						},
+						"description": "Get posts by a specific user ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Posts by Username",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/users/{{username}}/posts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"users",
+								"{{username}}",
+								"posts",
+								""
+							]
+						},
+						"description": "Get posts by a specific username."
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Post",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Post Title\",\n    \"content\": \"This is the updated content of my post.\",\n    \"post_type\": \"text\",\n    \"metadata\": {}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/posts/edit/{{post_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"edit",
+								"{{post_id}}",
+								""
+							]
+						},
+						"description": "Edit an existing post (only post author can edit)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/delete/{{post_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"delete",
+								"{{post_id}}",
+								""
+							]
+						},
+						"description": "Delete a post (only post author or admin can delete)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/public/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"public",
+								""
+							]
+						},
+						"description": "Get all public posts."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Private Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/private/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"private",
+								""
+							]
+						},
+						"description": "Get private posts (user's own posts)."
+					},
+					"response": []
+				}
+			],
+			"description": "Post management endpoints for creating, reading, updating, and deleting posts."
+		},
+		{
+			"name": "💬 Comments",
+			"item": [
+				{
+					"name": "Get Post Comments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/comments/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"comments",
+								""
+							]
+						},
+						"description": "Get all comments for a specific post."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"This is a great post!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/comments/create/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"comments",
+								"create",
+								""
+							]
+						},
+						"description": "Create a new comment on a specific post."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Comment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/comments/{{comment_id}}/delete/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"comments",
+								"{{comment_id}}",
+								"delete",
+								""
+							]
+						},
+						"description": "Delete a specific comment (only comment author or admin can delete)."
+					},
+					"response": []
+				}
+			],
+			"description": "Comment management endpoints for creating, reading, and deleting comments on posts."
+		},
+		{
+			"name": "❤️ Likes & Engagement",
+			"item": [
+				{
+					"name": "Like Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/like/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"like",
+								""
+							]
+						},
+						"description": "Like a specific post."
+					},
+					"response": []
+				},
+				{
+					"name": "Unlike Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/unlike/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"unlike",
+								""
+							]
+						},
+						"description": "Remove like from a specific post."
+					},
+					"response": []
+				},
+				{
+					"name": "Count Post Likes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/countlikes/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"countlikes",
+								""
+							]
+						},
+						"description": "Get the total number of likes for a specific post."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users Who Liked Post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/likedby/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"likedby",
+								""
+							]
+						},
+						"description": "Get list of users who liked a specific post."
+					},
+					"response": []
+				}
+			],
+			"description": "Like and engagement endpoints for managing post interactions."
+		},
+		{
+			"name": "📰 Newsfeed",
+			"item": [
+				{
+					"name": "Get Newsfeed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/feed/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"feed",
+								""
+							]
+						},
+						"description": "Get the main newsfeed with all posts."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Latest Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/feed/latest/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"feed",
+								"latest",
+								""
+							]
+						},
+						"description": "Get the most recent posts."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Posts Feed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/feed/public/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"feed",
+								"public",
+								""
+							]
+						},
+						"description": "Get feed of public posts only."
+					},
+					"response": []
+				}
+			],
+			"description": "Newsfeed endpoints for retrieving different types of post feeds."
+		},
+		{
+			"name": "🔧 Admin Operations",
+			"item": [
+				{
+					"name": "Admin Get Post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/api/posts/{{post_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"api",
+								"posts",
+								"{{post_id}}",
+								""
+							]
+						},
+						"description": "Admin endpoint to get post details."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Update Post",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Admin Updated Title\",\n    \"content\": \"This post was updated by an admin.\",\n    \"post_type\": \"text\",\n    \"metadata\": {}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/api/posts/{{post_id}}/update/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"api",
+								"posts",
+								"{{post_id}}",
+								"update",
+								""
+							]
+						},
+						"description": "Admin endpoint to update any post."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/api/posts/{{post_id}}/delete/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"api",
+								"posts",
+								"{{post_id}}",
+								"delete",
+								""
+							]
+						},
+						"description": "Admin endpoint to delete any post."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Get Comment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/api/comments/{{comment_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"api",
+								"comments",
+								"{{comment_id}}",
+								""
+							]
+						},
+						"description": "Admin endpoint to get comment details."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Update Comment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"This comment was updated by an admin.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/api/comments/{{comment_id}}/update/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"api",
+								"comments",
+								"{{comment_id}}",
+								"update",
+								""
+							]
+						},
+						"description": "Admin endpoint to update any comment."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Delete Comment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/api/comments/{{comment_id}}/delete/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"api",
+								"comments",
+								"{{comment_id}}",
+								"delete",
+								""
+							]
+						},
+						"description": "Admin endpoint to delete any comment."
+					},
+					"response": []
+				}
+			],
+			"description": "Admin-specific endpoints for managing posts and comments with elevated privileges."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set default values for variables if they don't exist",
+					"if (!pm.environment.get('base_url')) {",
+					"    pm.environment.set('base_url', 'http://127.0.0.1:8000');",
+					"}",
+					"",
+					"// Log the request being made",
+					"console.log('Making request to: ' + pm.request.url);",
+					"console.log('Method: ' + pm.request.method);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Common test script for all requests",
+					"pm.test('Status code is 200 or 201', function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+					"});",
+					"",
+					"pm.test('Response has valid JSON', function () {",
+					"    pm.response.to.have.jsonBody();",
+					"});",
+					"",
+					"// Store auth token if present in response",
+					"if (pm.response.json().token) {",
+					"    pm.environment.set('auth_token', pm.response.json().token);",
+					"    console.log('Auth token stored successfully');",
+					"}",
+					"",
+					"// Store user ID if present in response",
+					"if (pm.response.json().user && pm.response.json().user.id) {",
+					"    pm.environment.set('user_id', pm.response.json().user.id);",
+					"    console.log('User ID stored: ' + pm.response.json().user.id);",
+					"}",
+					"",
+					"// Store post ID if present in response",
+					"if (pm.response.json().id && pm.request.url.path.includes('posts')) {",
+					"    pm.environment.set('post_id', pm.response.json().id);",
+					"    console.log('Post ID stored: ' + pm.response.json().id);",
+					"}",
+					"",
+					"// Store comment ID if present in response",
+					"if (pm.response.json().id && pm.request.url.path.includes('comments')) {",
+					"    pm.environment.set('comment_id', pm.response.json().id);",
+					"    console.log('Comment ID stored: ' + pm.response.json().id);",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "post_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "comment_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "testuser",
+			"type": "string"
+		}
+	]
+}

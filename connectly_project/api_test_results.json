@@ -1,0 +1,202 @@
+[
+  {
+    "endpoint": "/posts/users/",
+    "method": "POST",
+    "success": false,
+    "response_code": 400,
+    "details": "Response: {\"error\":\"Username already exists.\"}",
+    "timestamp": "2025-08-18 15:58:33"
+  },
+  {
+    "endpoint": "/api-token-auth/",
+    "method": "POST",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: {\"token\":\"838062c1c19d5bf4bd56b108401519bd4dbffd1b\"}",
+    "timestamp": "2025-08-18 15:58:33"
+  },
+  {
+    "endpoint": "/posts/protected/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: {\"message\":\"Authenticated!\"}",
+    "timestamp": "2025-08-18 15:58:33"
+  },
+  {
+    "endpoint": "/posts/users/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: [{\"id\":8,\"username\":\"jomariabejostorage@gmail.com\",\"email\":\"jomariabejostorage@gmail.com\"},{\"id\":9,\"",
+    "timestamp": "2025-08-18 15:58:33"
+  },
+  {
+    "endpoint": "/posts/posts/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: [{\"id\":6,\"title\":\"Heres my first post\",\"content\":\"I am Jake\",\"author_id\":13,\"author_username\":\"Jake\"",
+    "timestamp": "2025-08-18 15:58:33"
+  },
+  {
+    "endpoint": "/posts/posts/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: [{\"id\":6,\"title\":\"Heres my first post\",\"content\":\"I am Jake\",\"author_id\":13,\"author_username\":\"Jake\"",
+    "timestamp": "2025-08-18 15:58:33"
+  },
+  {
+    "endpoint": "/posts/posts/6/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: {\"id\":6,\"title\":\"Heres my first post\",\"content\":\"I am Jake\",\"author_id\":13,\"author_username\":\"Jake\",",
+    "timestamp": "2025-08-18 15:58:33"
+  },
+  {
+    "endpoint": "/posts/posts/my-posts/",
+    "method": "GET",
+    "success": false,
+    "response_code": 500,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta http-equiv=\"content-type\" content=\"text/html; charse",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/edit/6/",
+    "method": "PUT",
+    "success": false,
+    "response_code": 403,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta http-equiv=\"content-type\" content=\"text/html; charse",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/public/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: [{\"id\":6,\"title\":\"Heres my first post\",\"content\":\"I am Jake\",\"author_id\":13,\"author_username\":\"Jake\"",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/private/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: []",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/comments/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" conten",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/comments/create/",
+    "method": "POST",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" conten",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/comments/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" conten",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/like/",
+    "method": "POST",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" conten",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/countlikes/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: {\"likes_count\":1}",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/likedby/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: [{\"id\":47,\"username\":\"testuser_api\",\"email\":\"testapi@example.com\"}]",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/unlike/",
+    "method": "POST",
+    "success": false,
+    "response_code": 405,
+    "details": "Response: {\"detail\":\"Method \\\"POST\\\" not allowed.\"}",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/6/countlikes/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: {\"likes_count\":1}",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/feed/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: {\"count\":22,\"next\":\"http://127.0.0.1:8000/posts/posts/feed/?page=2\",\"previous\":null,\"results\":[{\"id\"",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/feed/latest/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" conten",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/posts/feed/public/",
+    "method": "GET",
+    "success": true,
+    "response_code": 200,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" conten",
+    "timestamp": "2025-08-18 15:58:34"
+  },
+  {
+    "endpoint": "/posts/api/posts/6/",
+    "method": "GET",
+    "success": false,
+    "response_code": 403,
+    "details": "Response: {\"error\":\"Admin access required\"}",
+    "timestamp": "2025-08-18 15:58:35"
+  },
+  {
+    "endpoint": "/posts/api/posts/6/update/",
+    "method": "PUT",
+    "success": false,
+    "response_code": 405,
+    "details": "Response: {\"detail\":\"Method \\\"PUT\\\" not allowed.\"}",
+    "timestamp": "2025-08-18 15:58:35"
+  },
+  {
+    "endpoint": "/posts/posts/delete/6/",
+    "method": "DELETE",
+    "success": false,
+    "response_code": 403,
+    "details": "Response: <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta http-equiv=\"content-type\" content=\"text/html; charse",
+    "timestamp": "2025-08-18 15:58:35"
+  }
+]

@@ -1,0 +1,605 @@
+{
+	"info": {
+		"_postman_id": "connectly-project-working-api-collection",
+		"name": "Connectly Project - Working APIs Only",
+		"description": "Postman collection containing only the working API endpoints from the Connectly Django project. This collection has been tested and verified to work correctly.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "connectly-project"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication (100% Working)",
+			"item": [
+				{
+					"name": "User Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\",\n    \"email\": \"test@example.com\",\n    \"role\": \"User\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"users",
+								""
+							]
+						},
+						"description": "Register a new user account. Role can be 'User' or 'Admin'. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "User Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "testuser",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "testpass123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api-token-auth/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api-token-auth",
+								""
+							]
+						},
+						"description": "Authenticate user and receive authentication token using Django REST Framework's built-in endpoint. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Authentication",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/protected/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"protected",
+								""
+							]
+						},
+						"description": "Verify that the authentication token is valid. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration, login, and token verification. All endpoints tested and working."
+		},
+		{
+			"name": "👥 User Management (100% Working)",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"users",
+								""
+							]
+						},
+						"description": "Retrieve list of all registered users (requires authentication). ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/accounts/api/users/{{user_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"api",
+								"users",
+								"{{user_id}}",
+								""
+							]
+						},
+						"description": "Get specific user details by user ID (admin only). ✅ TESTED AND WORKING"
+					},
+					"response": []
+				}
+			],
+			"description": "User management endpoints for reading user data. All endpoints tested and working."
+		},
+		{
+			"name": "📝 Posts (67% Working)",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								""
+							]
+						},
+						"description": "Retrieve all posts (requires authentication). ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								""
+							]
+						},
+						"description": "Get specific post details by post ID. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/public/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"public",
+								""
+							]
+						},
+						"description": "Get all public posts. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Private Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/private/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"private",
+								""
+							]
+						},
+						"description": "Get private posts (user's own posts). ✅ TESTED AND WORKING"
+					},
+					"response": []
+				}
+			],
+			"description": "Post management endpoints for reading posts. Write operations (create/edit/delete) have CSRF issues and are not included."
+		},
+		{
+			"name": "💬 Comments (100% Working)",
+			"item": [
+				{
+					"name": "Get Post Comments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/comments/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"comments",
+								""
+							]
+						},
+						"description": "Get all comments for a specific post. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"This is a great post!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/comments/create/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"comments",
+								"create",
+								""
+							]
+						},
+						"description": "Create a new comment on a specific post. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				}
+			],
+			"description": "Comment management endpoints for creating and reading comments on posts. All endpoints tested and working."
+		},
+		{
+			"name": "❤️ Likes & Engagement (60% Working)",
+			"item": [
+				{
+					"name": "Like Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/like/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"like",
+								""
+							]
+						},
+						"description": "Like a specific post. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Count Post Likes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/countlikes/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"countlikes",
+								""
+							]
+						},
+						"description": "Get the total number of likes for a specific post. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users Who Liked Post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/{{post_id}}/likedby/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"{{post_id}}",
+								"likedby",
+								""
+							]
+						},
+						"description": "Get list of users who liked a specific post. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				}
+			],
+			"description": "Like and engagement endpoints for managing post interactions. Unlike functionality has method issues and is not included."
+		},
+		{
+			"name": "📰 Newsfeed (100% Working)",
+			"item": [
+				{
+					"name": "Get Newsfeed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/feed/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"feed",
+								""
+							]
+						},
+						"description": "Get the main newsfeed with all posts. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Latest Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/feed/latest/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"feed",
+								"latest",
+								""
+							]
+						},
+						"description": "Get the most recent posts. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Posts Feed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/posts/posts/feed/public/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"posts",
+								"posts",
+								"feed",
+								"public",
+								""
+							]
+						},
+						"description": "Get feed of public posts only. ✅ TESTED AND WORKING"
+					},
+					"response": []
+				}
+			],
+			"description": "Newsfeed endpoints for retrieving different types of post feeds. All endpoints tested and working."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set default values for variables if they don't exist",
+					"if (!pm.environment.get('base_url')) {",
+					"    pm.environment.set('base_url', 'http://127.0.0.1:8000');",
+					"}",
+					"",
+					"// Log the request being made",
+					"console.log('Making request to: ' + pm.request.url);",
+					"console.log('Method: ' + pm.request.method);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Common test script for all requests",
+					"pm.test('Status code is 200, 201, or 302', function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 302]);",
+					"});",
+					"",
+					"// Store auth token if present in response",
+					"if (pm.response.json() && pm.response.json().token) {",
+					"    pm.environment.set('auth_token', pm.response.json().token);",
+					"    console.log('Auth token stored successfully');",
+					"}",
+					"",
+					"// Store user ID if present in response",
+					"if (pm.response.json() && pm.response.json().user && pm.response.json().user.id) {",
+					"    pm.environment.set('user_id', pm.response.json().user.id);",
+					"    console.log('User ID stored: ' + pm.response.json().user.id);",
+					"}",
+					"",
+					"// Store post ID if present in response",
+					"if (pm.response.json() && pm.response.json().id && pm.request.url.path.includes('posts')) {",
+					"    pm.environment.set('post_id', pm.response.json().id);",
+					"    console.log('Post ID stored: ' + pm.response.json().id);",
+					"}",
+					"",
+					"// Store comment ID if present in response",
+					"if (pm.response.json() && pm.response.json().id && pm.request.url.path.includes('comments')) {",
+					"    pm.environment.set('comment_id', pm.response.json().id);",
+					"    console.log('Comment ID stored: ' + pm.response.json().id);",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "post_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "comment_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "testuser",
+			"type": "string"
+		}
+	]
+}

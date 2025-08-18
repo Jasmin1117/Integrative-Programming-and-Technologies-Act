@@ -8,8 +8,8 @@ Function views
     1. Add an import:  from my_app import views
     2. Add a URL to urlpatterns:  path('', views.home, name='home')
 Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+    1. Add an import:  from other_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.authtoken.views import obtain_auth_token
 
 from connectly_project.views import home
 
@@ -25,5 +26,6 @@ urlpatterns = [
     path('posts/', include('posts.urls')),
     path('accounts/', include('accounts.urls')),
     path("__reload__/", include("django_browser_reload.urls")),
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('', home, name='home'),  # Set home URL
 ]
