@@ -54,7 +54,7 @@ INTERNAL_IPS = [
 # Copy the result and paste it down here
 
 # [On my end it is C:\\Program Files\\nodejs\\npm.cmd]
-NPM_BIN_PATH = "C:\\Program Files\\nodejs\\npm.cmd"
+NPM_BIN_PATH = "/usr/bin/npm"
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
@@ -163,13 +163,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# SSL Settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# SSL Settings (Disabled for development)
+# SECURE_SSL_REDIRECT = False
+# SESSION_COOKIE_SECURE = False
+# CSRF_COOKIE_SECURE = False
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
 
 # Password Hashers
 PASSWORD_HASHERS = [
@@ -189,5 +189,5 @@ REST_FRAMEWORK = {
 }
 
 
-DEFAULT_REDIRECT_URL = "https://127.0.0.1:8000/"
-LOGOUT_REDIRECT_URL = 'https://127.0.0.1:8000/api/auth/login/'
+DEFAULT_REDIRECT_URL = "http://127.0.0.1:8000/"
+LOGOUT_REDIRECT_URL = 'http://127.0.0.1:8000/'

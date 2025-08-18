@@ -15,7 +15,11 @@ from posts.views import (
     PostComments, PostCommentsView, CreateComment, CommentDeleteView,
 
     # Likes
-    LikePostView, UnlikePostView, CountLikes, LikedBy, PostCommentsDetails
+    LikePostView, UnlikePostView, CountLikes, LikedBy, PostCommentsDetails,
+
+    # Admin API Views
+    AdminPostAPI, AdminPostUpdateAPI, AdminPostDeleteAPI,
+    AdminCommentAPI, AdminCommentUpdateAPI, AdminCommentDeleteAPI,
 )
 
 urlpatterns = [
@@ -47,12 +51,19 @@ urlpatterns = [
     path('posts/<int:pk>/comments/create/', CreateComment.as_view(), name='create-comment'),
     path('posts/<int:post_id>/comments/<int:comment_id>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 
-
     # Likes & Engagement
     path('posts/<int:post_id>/like/', LikePostView.as_view(), name='like_post'),
     path('posts/<int:post_id>/unlike/', UnlikePostView.as_view(), name='unlike-post'),
     path('posts/<int:pk>/countlikes/', CountLikes.as_view(), name='count-likes'),
     path('posts/<int:pk>/likedby/', LikedBy.as_view(), name='liked-by'),
+
+    # Admin API endpoints for post and comment management
+    path('api/posts/<int:post_id>/', AdminPostAPI.as_view(), name='post-api-detail'),
+    path('api/posts/<int:post_id>/update/', AdminPostUpdateAPI.as_view(), name='post-api-update'),
+    path('api/posts/<int:post_id>/delete/', AdminPostDeleteAPI.as_view(), name='post-api-delete'),
+    path('api/comments/<int:comment_id>/', AdminCommentAPI.as_view(), name='comment-api-detail'),
+    path('api/comments/<int:comment_id>/update/', AdminCommentUpdateAPI.as_view(), name='comment-api-update'),
+    path('api/comments/<int:comment_id>/delete/', AdminCommentDeleteAPI.as_view(), name='comment-api-delete'),
 ]
 
 """

@@ -7,12 +7,15 @@ from rest_framework.generics import ListAPIView, DestroyAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
+from rest_framework import status
 
 from factories.post_factory import PostFactory
-from posts.models import Like
+from posts.models import Like, Post, Comment
 from posts.permissions import IsPostAuthor, IsPostAuthorOrAdmin, IsCommentAuthorOrAdmin
 from posts.serializers import PostSerializer, CommentSerializer
 from singletons.logger_singleton import LoggerSingleton
+from django.contrib import messages
+from django.shortcuts import redirect
 
 # Get the user model
 User = get_user_model()
@@ -290,22 +293,39 @@ class PostCommentsView(ListAPIView):
 
 class LikePostView(APIView):
     """Handles liking and unliking a post."""
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, post_id):
         """Toggles like status for a specific post."""
+        logger.info(f"Like request from user: {request.user.username if request.user.is_authenticated else 'Anonymous'}")
+        logger.info(f"Request headers: {dict(request.headers)}")
+        
         post = get_object_or_404(Post, id=post_id)
         like = Like.objects.filter(user=request.user, post=post).first()
 
         if like:
             like.delete()
             message = "Post unliked successfully."
+            logger.info(f"Post {post_id} unliked by user {request.user.username}")
         else:
             Like.objects.create(user=request.user, post=post)
             message = "Post liked successfully."
+            logger.info(f"Post {post_id} liked by user {request.user.username}")
 
         # Get the latest like count
         like_count = post.likes.count()
+        logger.info(f"Post {post_id} now has {like_count} likes")
+        
+        # If this is a regular form submission (not AJAX/JSON), redirect back instead of showing DRF page
+        accepts_json = 'application/json' in (request.headers.get('Accept') or '')
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        if not accepts_json and not is_ajax:
+            try:
+                messages.success(request, message)
+            except Exception:
+                pass
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
         return Response({"message": message, "like_count": like_count}, status=status.HTTP_200_OK)
 
@@ -330,7 +350,7 @@ class PublicPostsView(View):
     """Renders public posts in a UI template."""
 
     def get(self, request):
-        public_posts = Post.objects.filter(privacy='public').order_by('-created_at')  # Fetch all public posts
+        public_posts = Post.objects.filter(privacy='public').prefetch_related('comments__user').order_by('-created_at')  # Fetch all public posts with comments
         return render(request, 'posts/public_posts.html', {'posts': public_posts})
 
 
@@ -348,7 +368,7 @@ class LatestPostsView(View):
     """Renders the latest posts in a UI template."""
 
     def get(self, request):
-        latest_posts = Post.objects.filter(privacy='public').order_by('-created_at')[:10]
+        latest_posts = Post.objects.filter(privacy='public').prefetch_related('comments__user').order_by('-created_at')[:10]
         return render(request, 'posts/latest_posts.html', {'posts': latest_posts})
 
 
@@ -626,14 +646,25 @@ class PostCommentsDetails(View):
 
 class CreateComment(APIView):
     """Creates a comment on a specific post."""
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         post = get_object_or_404(Post, id=pk)
-        serializer = CommentSerializer(data=request.data)
+        serializer = CommentSerializer(data=request.data, context={'user': request.user, 'post': post})
         if serializer.is_valid():
-            serializer.save(user=request.user, post=post)
+            serializer.save()
+            
+            # If this is a regular form submission (not AJAX/JSON), redirect back instead of showing DRF page
+            accepts_json = 'application/json' in (request.headers.get('Accept') or '')
+            is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+            if not accepts_json and not is_ajax:
+                try:
+                    messages.success(request, "Comment added successfully!")
+                except Exception:
+                    pass
+                return redirect(request.META.get('HTTP_REFERER', '/'))
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -660,3 +691,148 @@ class LikedBy(APIView):
         liked_users = User.objects.filter(likes__post=post)
         serializer = UserSerializer(liked_users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Admin API Views for Post and Comment Management
+class AdminPostAPI(APIView):
+    """Admin API for getting post details."""
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, post_id):
+        """Get post details for admin editing."""
+        if not request.user.is_superuser:
+            return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            post = Post.objects.get(id=post_id)
+            return Response({
+                'id': post.id,
+                'title': post.title,
+                'content': post.content,
+                'post_type': post.post_type,
+                'privacy': post.privacy,
+                'created_by': post.created_by.username,
+                'created_at': post.created_at.isoformat(),
+            })
+        except Post.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class AdminPostUpdateAPI(APIView):
+    """Admin API for updating posts."""
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        """Update post details."""
+        if not request.user.is_superuser:
+            return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            post = Post.objects.get(id=post_id)
+            data = request.data
+            
+            if 'title' in data:
+                post.title = data['title']
+            if 'content' in data:
+                post.content = data['content']
+            if 'post_type' in data:
+                post.post_type = data['post_type']
+            if 'privacy' in data:
+                post.privacy = data['privacy']
+            
+            post.save()
+            return Response({'success': True, 'message': 'Post updated successfully'})
+        except Post.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminPostDeleteAPI(APIView):
+    """Admin API for deleting posts."""
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, post_id):
+        """Delete a post."""
+        if not request.user.is_superuser:
+            return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            post = Post.objects.get(id=post_id)
+            post.delete()
+            return Response({'success': True, 'message': 'Post deleted successfully'})
+        except Post.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminCommentAPI(APIView):
+    """Admin API for getting comment details."""
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, comment_id):
+        """Get comment details for admin editing."""
+        if not request.user.is_superuser:
+            return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            return Response({
+                'id': comment.id,
+                'text': comment.text,
+                'user': comment.user.username,
+                'post_id': comment.post.id,
+                'created_at': comment.created_at.isoformat(),
+            })
+        except Comment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class AdminCommentUpdateAPI(APIView):
+    """Admin API for updating comments."""
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, comment_id):
+        """Update comment details."""
+        if not request.user.is_superuser:
+            return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            data = request.data
+            
+            if 'text' in data:
+                comment.text = data['text']
+            
+            comment.save()
+            return Response({'success': True, 'message': 'Comment updated successfully'})
+        except Comment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminCommentDeleteAPI(APIView):
+    """Admin API for deleting comments."""
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, comment_id):
+        """Delete a comment."""
+        if not request.user.is_superuser:
+            return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            comment.delete()
+            return Response({'success': True, 'message': 'Comment deleted successfully'})
+        except Comment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
